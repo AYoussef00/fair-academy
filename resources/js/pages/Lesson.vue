@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { computed } from 'vue';
 import { BookOpen, CheckCircle2, FileText, Play, Video } from 'lucide-vue-next';
-import AppLayout from '@/layouts/AppLayout.vue';
+import { computed } from 'vue';
 import { Card } from '@/components/ui/card';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { sanitizeRichHtml } from '@/lib/sanitizeHtml';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 
@@ -36,6 +37,7 @@ const props = defineProps<{
 }>();
 
 const completedIds = computed(() => new Set(props.completed_lesson_ids ?? []));
+const safeLessonContent = computed(() => sanitizeRichHtml(props.lesson.content));
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'لوحة التحكم', href: dashboard() },
@@ -162,7 +164,7 @@ function lessonUrl(lessonId: number) {
                             <div
                                 v-if="lesson.content"
                                 class="prose prose-slate mt-6 dark:prose-invert"
-                                v-html="lesson.content"
+                                v-html="safeLessonContent"
                             />
                             <p
                                 v-else-if="!lesson.video_url"

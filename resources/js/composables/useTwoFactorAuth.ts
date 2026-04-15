@@ -1,5 +1,6 @@
 import type { ComputedRef, Ref } from 'vue';
 import { computed, ref } from 'vue';
+import { sanitizeRichHtml } from '@/lib/sanitizeHtml';
 import { qrCode, recoveryCodes, secretKey } from '@/routes/two-factor';
 
 export type UseTwoFactorAuthReturn = {
@@ -39,10 +40,9 @@ const hasSetupData = computed<boolean>(
 );
 
 export const useTwoFactorAuth = (): UseTwoFactorAuthReturn => {
-    const sanitizeSvg = (svg: string): string =>
-        svg.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
+    const sanitizeSvg = (svg: string): string => sanitizeRichHtml(svg);
 
-        const fetchQrCode = async (): Promise<void> => {
+    const fetchQrCode = async (): Promise<void> => {
         try {
             const { svg } = await fetchJson<{ svg: string; url: string }>(
                 qrCode.url(),

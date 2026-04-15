@@ -33,7 +33,7 @@ class SecurityHeadersMiddleware
     {
         $directives = config('security-headers.csp', [
             'default-src' => ["'self'"],
-            'script-src' => ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://cdn.tailwindcss.com', 'https://cdn.jsdelivr.net'],
+            'script-src' => ["'self'", 'https://cdn.tailwindcss.com', 'https://cdn.jsdelivr.net'],
             'style-src' => ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdn.tailwindcss.com'],
             'font-src' => ["'self'", 'https://fonts.gstatic.com'],
             'img-src' => ["'self'", 'data:', 'https:'],
@@ -41,7 +41,18 @@ class SecurityHeadersMiddleware
             'connect-src' => ["'self'"],
             'base-uri' => ["'self'"],
             'form-action' => ["'self'"],
+            'object-src' => ["'none'"],
+            'frame-ancestors' => ["'self'"],
         ]);
+
+        if (config('app.env') !== 'production' && isset($directives['script-src']) && is_array($directives['script-src'])) {
+            if (! in_array("'unsafe-inline'", $directives['script-src'], true)) {
+                $directives['script-src'][] = "'unsafe-inline'";
+            }
+            if (! in_array("'unsafe-eval'", $directives['script-src'], true)) {
+                $directives['script-src'][] = "'unsafe-eval'";
+            }
+        }
 
         $parts = [];
         foreach ($directives as $name => $sources) {
