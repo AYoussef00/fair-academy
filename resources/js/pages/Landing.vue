@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Head, Link, usePage } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
 import {
     BookOpen,
     Award,
@@ -10,9 +9,10 @@ import {
     CheckCircle2,
     ChevronRight,
 } from 'lucide-vue-next';
-import { login, register, home, dashboard, courses } from '@/routes';
-import SiteHeader from '@/components/SiteHeader.vue';
+import { computed, ref } from 'vue';
 import ImageWithFallback from '@/components/ImageWithFallback.vue';
+import SiteHeader from '@/components/SiteHeader.vue';
+import { courses as coursesRoute, dashboard, home, login, register } from '@/routes';
 
 const props = defineProps<{
     categories?: Array<{ id: number; name: string }>;
@@ -116,31 +116,31 @@ const benefits = [
         <SiteHeader />
 
         <!-- Hero -->
-        <section class="relative overflow-hidden pt-28 pb-24 md:pt-36 md:pb-32">
+        <section class="relative overflow-hidden pb-16 pt-20 sm:pt-24 md:pb-24 md:pt-32">
             <div
                 class="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(139,92,246,0.12),transparent)]"
             />
             <div
                 class="absolute left-1/2 top-1/3 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-violet-400/15 blur-[120px]"
             />
-            <div class="relative mx-auto max-w-6xl px-6 text-center">
+            <div class="relative mx-auto max-w-6xl px-4 text-center sm:px-6">
                 <h1
-                    class="mx-auto max-w-4xl text-4xl font-extrabold leading-[1.15] tracking-tight text-slate-900 md:text-6xl lg:text-7xl"
+                    class="mx-auto max-w-4xl text-3xl font-extrabold leading-[1.2] tracking-tight text-slate-900 sm:text-4xl md:text-6xl lg:text-7xl"
                 >
                     أتقن مهارات جديدة مع
                     <span style="color: #ed9134">
                         كورسات عالمية المستوى
                     </span>
                 </h1>
-                <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-600 md:text-xl">
+                <p class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg md:text-xl">
                     انضمّ إلى آلاف المتعلمين. ادخل إلى كورسات يقدّمها خبراء، واحصل على شهادات، وطوّر مسيرتك من أي مكان.
                 </p>
-                <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+                <div class="mt-8 flex flex-col items-stretch justify-center gap-3 sm:mt-10 sm:flex-row sm:items-center sm:gap-4">
                     <Link
                         v-if="!authUser"
                         :href="register()"
-                        class="group inline-flex items-center gap-2 rounded-xl px-8 py-4 text-base font-semibold text-white shadow-xl transition hover:opacity-95"
-                    style="background-color: #ed9134; box-shadow: 0 20px 25px -5px rgb(237 145 52 / 0.3);"
+                        class="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-base font-semibold text-white shadow-xl transition hover:opacity-95 sm:w-auto sm:px-8 sm:py-4"
+                        style="background-color: #ed9134; box-shadow: 0 20px 25px -5px rgb(237 145 52 / 0.3);"
                     >
                         ابدأ التعلّم مجاناً
                         <ArrowRight
@@ -150,7 +150,7 @@ const benefits = [
                     <Link
                         v-else
                         :href="dashboard()"
-                        class="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-600 px-8 py-4 text-base font-semibold text-white shadow-xl shadow-violet-500/30 transition hover:shadow-violet-500/50"
+                        class="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-600 px-6 py-3.5 text-base font-semibold text-white shadow-xl shadow-violet-500/30 transition hover:shadow-violet-500/50 sm:w-auto sm:px-8 sm:py-4"
                     >
                         لوحة التحكم
                         <ArrowRight
@@ -159,7 +159,7 @@ const benefits = [
                     </Link>
                     <a
                         href="#how-it-works"
-                        class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-8 py-4 text-base font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+                        class="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3.5 text-base font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 sm:w-auto sm:px-8 sm:py-4"
                     >
                         <Play class="h-5 w-5" />
                         اعرف كيف يعمل
@@ -169,9 +169,9 @@ const benefits = [
         </section>
 
         <!-- Stats -->
-        <section class="border-y border-slate-200 bg-white py-12">
-            <div class="mx-auto max-w-6xl px-6">
-                <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+        <section class="border-y border-slate-200 bg-white py-10 sm:py-12">
+            <div class="mx-auto max-w-6xl px-4 sm:px-6">
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-8">
                     <div
                         v-for="(stat, i) in stats"
                         :key="i"
@@ -189,22 +189,22 @@ const benefits = [
         </section>
 
         <!-- Skills to transform your career -->
-        <section class="border-t border-slate-200 bg-white py-16 md:py-20">
-            <div class="mx-auto max-w-6xl px-6">
-                <h2 class="text-3xl font-bold text-gray-900 md:text-4xl">
+        <section class="border-t border-slate-200 bg-white py-12 md:py-20">
+            <div class="mx-auto max-w-6xl px-4 sm:px-6">
+                <h2 class="text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
                     دورات تُغيّر مسيرتك وحياتك
                 </h2>
-                <p class="mt-2 text-lg text-gray-600">
+                <p class="mt-2 text-base text-gray-600 sm:text-lg">
                     من المهارات الحرجة إلى المواضيع التقنية، أكاديمية فايرير للتدريب والتعليم تدعم تطوّرك المهني.
                 </p>
 
                 <!-- Category tabs (from DB) -->
-                <div class="mt-8 flex flex-wrap gap-x-6 gap-y-2 border-b border-gray-200 pb-0">
+                <div class="mt-8 flex gap-4 overflow-x-auto border-b border-gray-200 pb-1 whitespace-nowrap">
                     <button
                         v-for="cat in categoriesList"
                         :key="cat.id"
                         type="button"
-                        class="pb-4 text-sm font-medium transition hover:text-gray-900"
+                        class="shrink-0 pb-3 text-sm font-medium transition hover:text-gray-900"
                         :class="selectedCategoryId === cat.id
                             ? 'border-b-2 border-gray-900 text-gray-900'
                             : 'text-gray-500'"
@@ -225,13 +225,13 @@ const benefits = [
                     <div
                         v-else
                         ref="coursesScrollRef"
-                        class="flex gap-6 overflow-x-auto pb-4 scroll-smooth scrollbar-thin"
+                        class="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 ps-1 scroll-smooth sm:gap-6 scrollbar-thin"
                         style="scrollbar-width: none; -ms-overflow-style: none"
                     >
                         <div
                             v-for="course in filteredCourses"
                             :key="course.id"
-                            class="min-w-[280px] max-w-[280px] shrink-0 rounded-lg bg-white shadow-sm transition hover:shadow-md"
+                            class="min-w-[250px] max-w-[250px] shrink-0 snap-start rounded-lg bg-white shadow-sm transition hover:shadow-md sm:min-w-[280px] sm:max-w-[280px]"
                         >
                             <Link :href="`/course/${course.id}`" class="block">
                                 <ImageWithFallback
@@ -264,7 +264,7 @@ const benefits = [
                     <button
                         v-if="filteredCourses.length > 0"
                         type="button"
-                        class="absolute -right-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white shadow-md transition hover:bg-gray-50"
+                        class="absolute -right-3 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white shadow-md transition hover:bg-gray-50 md:flex"
                         aria-label="Scroll right"
                         @click="scrollCoursesRight"
                     >
@@ -273,7 +273,7 @@ const benefits = [
                 </div>
 
                 <Link
-                    :href="courses()"
+                    :href="coursesRoute()"
                     class="mt-6 inline-flex items-center gap-1 text-sm font-medium text-violet-600 hover:text-violet-700"
                 >
                     عرض كل الدورات
@@ -283,12 +283,12 @@ const benefits = [
         </section>
 
         <!-- Programs section: برامج فقط -->
-        <section class="border-t border-slate-200 bg-white py-16 md:py-20">
-            <div class="mx-auto max-w-6xl px-6">
-                <h2 class="text-3xl font-bold text-gray-900 md:text-4xl">
+        <section class="border-t border-slate-200 bg-white py-12 md:py-20">
+            <div class="mx-auto max-w-6xl px-4 sm:px-6">
+                <h2 class="text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
                     برامج تُغيّر مسيرتك وحياتك المهنية
                 </h2>
-                <p class="mt-2 text-lg text-gray-600">
+                <p class="mt-2 text-base text-gray-600 sm:text-lg">
                     من المهارات الحرجة إلى المواضيع التقنية، أكاديمية فايرير للتدريب والتعليم تدعم تطوّرك المهني.
                 </p>
 
@@ -303,13 +303,13 @@ const benefits = [
                     <div
                         v-else
                         ref="coursesScrollRef2"
-                        class="flex gap-6 overflow-x-auto pb-4 scroll-smooth scrollbar-thin"
+                        class="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 ps-1 scroll-smooth sm:gap-6 scrollbar-thin"
                         style="scrollbar-width: none; -ms-overflow-style: none"
                     >
                         <div
                             v-for="program in programsList"
                             :key="'program-' + program.id"
-                            class="min-w-[280px] max-w-[280px] shrink-0 rounded-lg bg-white shadow-sm transition hover:shadow-md"
+                            class="min-w-[250px] max-w-[250px] shrink-0 snap-start rounded-lg bg-white shadow-sm transition hover:shadow-md sm:min-w-[280px] sm:max-w-[280px]"
                         >
                             <Link :href="home()" class="block">
                                 <ImageWithFallback
@@ -334,7 +334,7 @@ const benefits = [
                     <button
                         v-if="programsList.length > 0"
                         type="button"
-                        class="absolute -right-3 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white shadow-md transition hover:bg-gray-50"
+                        class="absolute -right-3 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white shadow-md transition hover:bg-gray-50 md:flex"
                         aria-label="Scroll right"
                         @click="scrollCoursesRight2"
                     >
@@ -353,22 +353,22 @@ const benefits = [
         </section>
 
         <!-- Features -->
-        <section id="how-it-works" class="py-24 md:py-32">
-            <div class="mx-auto max-w-6xl px-6">
+        <section id="how-it-works" class="py-16 md:py-28">
+            <div class="mx-auto max-w-6xl px-4 sm:px-6">
                 <p class="text-center text-sm font-semibold uppercase tracking-wider text-[#ed9134]">
                     لماذا أكاديمية فايرير للتدريب والتعليم
                 </p>
-                <h2 class="mt-3 text-center text-3xl font-bold text-slate-900 md:text-4xl">
+                <h2 class="mt-3 text-center text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">
                     كل ما تحتاجه للنجاح
                 </h2>
                 <p class="mx-auto mt-4 max-w-2xl text-center text-slate-600">
                     منصّة تدعم رحلة تعلّمك من البداية حتى النهاية.
                 </p>
-                <div class="mt-16 grid gap-8 md:grid-cols-3">
+                <div class="mt-10 grid gap-5 md:mt-16 md:grid-cols-3 md:gap-8">
                     <div
                         v-for="(feature, i) in features"
                         :key="i"
-                        class="group rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition hover:border-[#ed9134]/40 hover:shadow-md"
+                        class="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-[#ed9134]/40 hover:shadow-md md:p-8"
                     >
                         <div
                             class="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-[#ed9134]/15 text-[#ed9134] transition group-hover:scale-105"
@@ -387,20 +387,20 @@ const benefits = [
         </section>
 
         <!-- CTA + Benefits -->
-        <section class="py-24 md:py-32">
-            <div class="mx-auto max-w-6xl px-6">
+        <section class="py-16 md:py-28">
+            <div class="mx-auto max-w-6xl px-4 sm:px-6">
                 <div
-                    class="relative overflow-hidden rounded-3xl border border-violet-100 bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 p-12 md:p-16 shadow-lg"
+                    class="relative overflow-hidden rounded-3xl border border-violet-100 bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 p-6 shadow-lg sm:p-8 md:p-16"
                 >
                     <div
                         class="absolute right-0 top-0 h-64 w-64 rounded-full bg-violet-200/40 blur-[100px]"
                     />
-                    <div class="relative grid gap-12 md:grid-cols-2 md:items-center">
+                    <div class="relative grid gap-8 md:grid-cols-2 md:items-center md:gap-12">
                         <div>
-                            <h2 class="text-3xl font-bold text-slate-900 md:text-4xl">
+                            <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">
                                 مستعد لبدء التعلّم؟
                             </h2>
-                            <p class="mt-4 text-lg text-slate-600">
+                            <p class="mt-4 text-base text-slate-600 sm:text-lg">
                                 انضم إلى أكاديمية فايرير للتدريب والتعليم اليوم واحصل على مئات الكورسات ومدربين خبراء وشهادات معتمدة.
                             </p>
                             <ul class="mt-6 space-y-3">
@@ -414,11 +414,11 @@ const benefits = [
                                 </li>
                             </ul>
                         </div>
-                        <div class="flex flex-col items-center justify-center md:items-end">
+                        <div class="flex flex-col items-stretch justify-center gap-3 md:items-end">
                             <template v-if="!authUser">
                                 <Link
                                     :href="register()"
-                                    class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-600 px-8 py-4 text-base font-semibold text-white shadow-xl transition hover:shadow-violet-500/40"
+                                    class="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-600 px-6 py-3.5 text-base font-semibold text-white shadow-xl transition hover:shadow-violet-500/40 sm:w-auto sm:px-8 sm:py-4"
                                 >
                                     إنشاء حساب مجاني
                                     <ArrowRight class="h-5 w-5" />
@@ -430,7 +430,7 @@ const benefits = [
                             <template v-else>
                                 <Link
                                     :href="dashboard()"
-                                    class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-600 px-8 py-4 text-base font-semibold text-white shadow-xl transition hover:shadow-violet-500/40"
+                                    class="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-600 px-6 py-3.5 text-base font-semibold text-white shadow-xl transition hover:shadow-violet-500/40 sm:w-auto sm:px-8 sm:py-4"
                                 >
                                     فتح لوحة التحكم
                                     <ArrowRight class="h-5 w-5" />
@@ -444,7 +444,7 @@ const benefits = [
 
         <!-- Footer -->
         <footer class="border-t border-slate-200 bg-slate-50">
-            <div class="mx-auto max-w-6xl px-6 py-14">
+            <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14">
                 <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
                     <!-- Brand -->
                     <div class="lg:col-span-1">
@@ -521,11 +521,11 @@ const benefits = [
                     </div>
                 </div>
 
-                <div class="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 md:flex-row">
+                <div class="mt-10 flex flex-col items-center justify-between gap-3 border-t border-slate-200 pt-7 text-center md:mt-12 md:flex-row md:gap-4 md:pt-8 md:text-start">
                     <p class="text-sm text-slate-500">
                         © {{ new Date().getFullYear() }} أكاديمية فايرير للتدريب والتعليم. جميع الحقوق محفوظة.
                     </p>
-                    <div class="flex gap-6 text-sm text-slate-500">
+                    <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-slate-500 md:justify-start">
                         <Link :href="login()" class="transition hover:text-slate-700">تسجيل الدخول</Link>
                         <Link :href="register()" class="transition hover:text-slate-700">التسجيل</Link>
                         <Link v-if="authUser" :href="dashboard()" class="transition hover:text-slate-700">لوحة التحكم</Link>

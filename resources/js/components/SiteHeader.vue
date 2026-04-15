@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
 import { Globe, Menu, Search, ShoppingCart } from 'lucide-vue-next';
+import { computed } from 'vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -37,9 +37,9 @@ const logoHref = computed(() => home());
 
 <template>
     <header
-        class="sticky top-0 z-50 border-b border-slate-200 bg-white"
+        class="sticky top-0 z-50 border-b border-slate-200/90 bg-white/95 backdrop-blur"
     >
-        <div class="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
+        <div class="mx-auto flex h-14 max-w-7xl items-center gap-2 px-3 sm:h-16 sm:gap-4 sm:px-6">
             <!-- Logo -->
             <Link
                 :href="logoHref"
@@ -48,12 +48,12 @@ const logoHref = computed(() => home());
                 <img
                     src="/asset/2e10fbcb-7501-4ed6-963f-7f2eb436ed1b.jpeg"
                     alt="أكاديمية فايرير للتدريب والتعليم"
-                    class="h-14 w-auto object-contain md:h-16"
+                    class="h-10 w-auto object-contain sm:h-12 md:h-16"
                 />
             </Link>
 
             <!-- Primary nav: Explore, Courses -->
-            <nav class="hidden shrink-0 items-center gap-1 sm:flex">
+            <nav class="hidden shrink-0 items-center gap-1 lg:flex">
                 <Link
                     :href="home()"
                     class="rounded px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
@@ -69,7 +69,7 @@ const logoHref = computed(() => home());
             </nav>
 
             <!-- Center: Search (pill) -->
-            <div class="relative hidden min-w-0 flex-1 max-w-xl lg:block">
+            <div class="relative hidden min-w-0 max-w-xl flex-1 xl:block">
                 <Search
                     class="pointer-events-none absolute start-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
                 />
@@ -81,7 +81,7 @@ const logoHref = computed(() => home());
             </div>
 
             <!-- End: Cart, Auth -->
-            <div class="ms-auto flex shrink-0 items-center gap-1">
+            <div class="ms-auto flex shrink-0 items-center gap-1 sm:gap-2">
                 <Link
                     v-if="authUser"
                     href="/cart"
@@ -125,17 +125,17 @@ const logoHref = computed(() => home());
                     </DropdownMenu>
                 </template>
                 <template v-else>
-                    <Link :href="login()">
+                    <Link :href="login()" class="hidden md:block">
                         <Button
                             variant="outline"
-                            class="h-9 rounded-full border-[#ed9134] bg-transparent px-4 text-sm font-medium text-[#ed9134] hover:bg-[#fff4e8] sm:inline-flex"
+                            class="h-9 rounded-full border-[#ed9134] bg-transparent px-4 text-sm font-medium text-[#ed9134] hover:bg-[#fff4e8]"
                         >
                             تسجيل دخول
                         </Button>
                     </Link>
-                    <Link :href="register()">
+                    <Link :href="register()" class="hidden md:block">
                         <Button
-                            class="h-9 rounded-full bg-[#ed9134] px-4 text-sm font-semibold text-white hover:bg-[#d67d2a] sm:inline-flex"
+                            class="h-9 rounded-full bg-[#ed9134] px-4 text-sm font-semibold text-white hover:bg-[#d67d2a]"
                         >
                             اشترك الآن
                         </Button>
@@ -145,7 +145,7 @@ const logoHref = computed(() => home());
                 <Button
                     variant="outline"
                     size="icon"
-                    class="h-9 w-9 shrink-0 rounded-full border-slate-200 bg-white"
+                    class="hidden h-9 w-9 shrink-0 rounded-full border-slate-200 bg-white lg:inline-flex"
                 >
                     <Globe class="h-5 w-5 text-slate-600" />
                     <span class="sr-only">اللغة</span>
@@ -162,7 +162,7 @@ const logoHref = computed(() => home());
                             <Menu class="h-5 w-5" />
                         </Button>
                     </SheetTrigger>
-                    <SheetContent side="right" class="w-[300px] p-6">
+                    <SheetContent side="right" class="w-[88vw] max-w-[320px] p-5 sm:p-6">
                         <SheetHeader class="text-right">
                             <SheetTitle class="sr-only">القائمة</SheetTitle>
                             <Link :href="logoHref" class="inline-flex">
@@ -173,7 +173,17 @@ const logoHref = computed(() => home());
                                 />
                             </Link>
                         </SheetHeader>
-                        <div class="mt-8 flex flex-col gap-2">
+                        <div class="relative mt-6">
+                            <Search
+                                class="pointer-events-none absolute start-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                            />
+                            <input
+                                type="search"
+                                placeholder="ابحث عن أي شيء"
+                                class="h-10 w-full rounded-full border border-slate-200 bg-slate-50 ps-11 pe-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-violet-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500"
+                            />
+                        </div>
+                        <div class="mt-6 flex flex-col gap-2">
                             <Link
                                 :href="home()"
                                 class="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
@@ -185,6 +195,13 @@ const logoHref = computed(() => home());
                                 class="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
                             >
                                 الدورات
+                            </Link>
+                            <Link
+                                v-if="authUser"
+                                :href="dashboard()"
+                                class="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                            >
+                                لوحة التحكم
                             </Link>
                             <Link
                                 v-if="authUser"
