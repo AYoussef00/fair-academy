@@ -1,0 +1,15 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app
+    level: 5
+    ignoreErrors:
+        -
+            identifier: property.notFound
+        -
+            identifier: argument.unresolvableType
+        -
+            identifier: greater.alwaysTrue
+            path: app/Http/Controllers/Student/StudentAttendanceController.php
