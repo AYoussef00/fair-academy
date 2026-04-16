@@ -1,12 +1,14 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminMediaJournalController;
 use App\Http\Controllers\Admin\CyberSecurityController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardDispatcherController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\ScientificJournalController;
 use App\Http\Controllers\Student\StudentAssignmentsController;
 use App\Http\Controllers\Student\StudentAttendanceController;
 use App\Http\Controllers\Student\StudentDashboardController;
@@ -21,6 +23,7 @@ Route::get('/', LandingController::class)->name('home');
 
 Route::get('/course/{id}', [CourseController::class, 'show'])->name('course.show');
 Route::inertia('/courses', 'Courses')->name('courses');
+Route::get('/scientific-journal', [ScientificJournalController::class, 'index'])->name('scientific-journal');
 
 Route::inertia('/welcome', 'Welcome', [
     'canRegister' => Features::enabled(Features::registration()),
@@ -72,6 +75,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
      */
     Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
+        Route::get('/media-journal', [AdminMediaJournalController::class, 'index'])->name('media-journal.index');
+        Route::patch('/media-journal/{article}/approve', [AdminMediaJournalController::class, 'approve'])->name('media-journal.approve');
+        Route::patch('/media-journal/{article}/reject', [AdminMediaJournalController::class, 'reject'])->name('media-journal.reject');
         Route::get('/categories', [\App\Http\Controllers\Admin\AdminCategoryController::class, 'index'])->name('categories.index');
         Route::get('/categories/create', [\App\Http\Controllers\Admin\AdminCategoryController::class, 'create'])->name('categories.create');
         Route::post('/categories', [\App\Http\Controllers\Admin\AdminCategoryController::class, 'store'])->name('categories.store');
@@ -106,6 +112,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
      */
     Route::get('/course/{course}/lesson/{lesson}', [CourseController::class, 'showLesson'])->name('course.lesson');
     Route::get('/course/{course}/module/{module}', [CourseController::class, 'showModule'])->name('course.module');
+    Route::post('/scientific-journal/submissions', [ScientificJournalController::class, 'store'])
+        ->name('scientific-journal.submissions.store')
+        ->middleware('throttle:uploads');
 });
 
 require __DIR__.'/settings.php';

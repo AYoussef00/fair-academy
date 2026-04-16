@@ -66,6 +66,12 @@ const logoHref = computed(() => home());
                 >
                     الدورات
                 </Link>
+                <Link
+                    href="/scientific-journal"
+                    class="rounded px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+                >
+                    المجلة العلمية
+                </Link>
             </nav>
 
             <!-- Center: Search (pill) -->
@@ -195,6 +201,12 @@ const logoHref = computed(() => home());
                                 class="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
                             >
                                 الدورات
+                            </Link>
+                            <Link
+                                href="/scientific-journal"
+                                class="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                            >
+                                المجلة العلمية
                             </Link>
                             <Link
                                 v-if="authUser"
