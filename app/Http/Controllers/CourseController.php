@@ -12,6 +12,31 @@ use Inertia\Inertia;
 
 class CourseController extends Controller
 {
+    public function index()
+    {
+        $courses = Course::query()
+            ->with(['category:id,name', 'instructor:id,name'])
+            ->where('status', 'published')
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn ($c) => [
+                'id' => $c->id,
+                'title' => $c->title,
+                'thumbnail' => $c->thumbnail
+                    ? (str_starts_with($c->thumbnail, 'http') ? $c->thumbnail : asset('storage/'.$c->thumbnail))
+                    : null,
+                'price' => (float) $c->price,
+                'category_name' => $c->category->name ?? 'غير مصنف',
+                'instructor' => $c->instructor->name ?? '—',
+                'duration' => $c->duration,
+            ])
+            ->values();
+
+        return Inertia::render('Courses', [
+            'courses' => $courses,
+        ]);
+    }
+
     public function showLesson(Request $request, int $courseId, int $lessonId)
     {
         $course = Course::with(['instructor', 'modules' => fn ($q) => $q->orderBy('order_number')->with(['lessons' => fn ($q) => $q->orderBy('order_number')])])

@@ -10,7 +10,6 @@ import {
     LayoutDashboard,
     Newspaper,
     UserRound,
-    Users,
 } from 'lucide-vue-next';
 import { Card } from '@/components/ui/card';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -20,31 +19,34 @@ import type { BreadcrumbItem } from '@/types';
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'لوحة التحكم', href: dashboard() },
     { title: 'لوحة المدير', href: '/admin/dashboard' },
+    { title: 'البرامج', href: '/admin/programs' },
 ];
 
 const props = withDefaults(
     defineProps<{
-        stats?: {
-            usersCount: number;
-            coursesCount: number;
-            programsCount: number;
-        };
+        programs?: Array<{
+            id: number;
+            title: string;
+            price: number;
+            duration?: string | null;
+            level?: string | null;
+            status?: string | null;
+            courses_count: number;
+            students_count: number;
+            created_at?: string | null;
+        }>;
     }>(),
     {
-        stats: () => ({
-            usersCount: 0,
-            coursesCount: 0,
-            programsCount: 0,
-        }),
+        programs: () => [],
     }
 );
 
 const sidebarItems = [
-    { title: 'لوحة التحكم', href: '/admin/dashboard', icon: LayoutDashboard, active: true },
+    { title: 'لوحة التحكم', href: '/admin/dashboard', icon: LayoutDashboard, active: false },
     { title: 'المستخدمين', href: '/admin/users', icon: UserRound, active: false },
     { title: 'الطلاب', href: '/admin/students', icon: GraduationCap, active: false },
     { title: 'الدورات', href: '/admin/courses', icon: BookOpen, active: false },
-    { title: 'البرامج', href: '/admin/programs', icon: FolderOpen, active: false },
+    { title: 'البرامج', href: '/admin/programs', icon: FolderOpen, active: true },
     { title: 'الكتب الرقمية', href: '/admin/digital-books', icon: BookText, active: false },
     { title: 'المجلة الاعلامية', href: '/admin/media-journal', icon: Newspaper, active: false },
     { title: 'المدفوعات', href: null, icon: CreditCard, active: false },
@@ -53,7 +55,7 @@ const sidebarItems = [
 </script>
 
 <template>
-    <Head title="لوحة المدير" />
+    <Head title="البرامج - لوحة المدير" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="min-h-full bg-slate-100/70 dark:bg-slate-950">
@@ -64,7 +66,6 @@ const sidebarItems = [
                             <p class="text-sm font-bold text-slate-900 dark:text-white">Admin</p>
                             <p class="mt-0.5 text-xs text-slate-500">مدير النظام</p>
                         </div>
-
                         <nav class="px-3 py-4">
                             <ul class="space-y-1">
                                 <li v-for="item in sidebarItems" :key="item.title">
@@ -84,7 +85,6 @@ const sidebarItems = [
                                         </span>
                                         <span class="leading-tight">{{ item.title }}</span>
                                     </Link>
-
                                     <button
                                         v-else
                                         type="button"
@@ -94,9 +94,7 @@ const sidebarItems = [
                                             <component :is="item.icon" class="h-4 w-4" />
                                         </span>
                                         <span class="leading-tight">{{ item.title }}</span>
-                                        <span class="me-auto rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-500 dark:bg-slate-800 dark:text-slate-400">
-                                            قريباً
-                                        </span>
+                                        <span class="me-auto rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-500 dark:bg-slate-800 dark:text-slate-400">قريباً</span>
                                     </button>
                                 </li>
                             </ul>
@@ -106,65 +104,42 @@ const sidebarItems = [
 
                 <main class="min-w-0 flex-1">
                     <div class="w-full space-y-6 px-6 py-6">
-                    <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                        <h1 class="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-                            لوحة التحكم
-                        </h1>
-                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                            مرحبًا بك في لوحة إدارة المنصة.
-                        </p>
-                    </div>
+                        <div class="rounded-lg border border-slate-200 bg-white px-6 py-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                            <h1 class="text-2xl font-semibold text-slate-900 dark:text-slate-100">البرامج</h1>
+                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">جدول بجميع البرامج في النظام وعدد الدورات والطلاب داخل كل برنامج.</p>
+                        </div>
 
-                    <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
-                        <Card class="border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-xs font-medium text-slate-500">إجمالي المستخدمين</p>
-                                    <p class="mt-1 text-3xl font-bold text-slate-900 dark:text-slate-100">
-                                        {{ props.stats.usersCount }}
-                                    </p>
-                                </div>
-                                <div class="rounded-lg bg-slate-100 p-2 dark:bg-slate-800">
-                                    <Users :size="20" class="text-slate-600 dark:text-slate-300" />
-                                </div>
+                        <Card class="overflow-hidden border-slate-200 bg-white p-0 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                            <div v-if="props.programs.length === 0" class="p-8 text-center text-sm text-slate-500">
+                                لا توجد برامج حالياً.
+                            </div>
+                            <div v-else class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
+                                    <thead class="bg-slate-50 dark:bg-slate-900/60">
+                                        <tr>
+                                            <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">البرنامج</th>
+                                            <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">السعر</th>
+                                            <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">المدة</th>
+                                            <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">المستوى</th>
+                                            <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">عدد الدورات</th>
+                                            <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">عدد الطلاب</th>
+                                            <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">الحالة</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                                        <tr v-for="program in props.programs" :key="program.id">
+                                            <td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">{{ program.title }}</td>
+                                            <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ program.price.toFixed(2) }} ر.س</td>
+                                            <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ program.duration || '—' }}</td>
+                                            <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ program.level || '—' }}</td>
+                                            <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ program.courses_count }}</td>
+                                            <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ program.students_count }}</td>
+                                            <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ program.status || 'draft' }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </Card>
-                        <Card class="border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-xs font-medium text-slate-500">إجمالي الدورات</p>
-                                    <p class="mt-1 text-3xl font-bold text-slate-900 dark:text-slate-100">
-                                        {{ props.stats.coursesCount }}
-                                    </p>
-                                </div>
-                                <div class="rounded-lg bg-slate-100 p-2 dark:bg-slate-800">
-                                    <BookOpen :size="20" class="text-slate-600 dark:text-slate-300" />
-                                </div>
-                            </div>
-                        </Card>
-                        <Card class="border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-xs font-medium text-slate-500">إجمالي البرامج</p>
-                                    <p class="mt-1 text-3xl font-bold text-slate-900 dark:text-slate-100">
-                                        {{ props.stats.programsCount }}
-                                    </p>
-                                </div>
-                                <div class="rounded-lg bg-slate-100 p-2 dark:bg-slate-800">
-                                    <FolderOpen :size="20" class="text-slate-600 dark:text-slate-300" />
-                                </div>
-                            </div>
-                        </Card>
-                    </div>
-
-                    <Card class="mt-6 border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                        <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                            You're logged in!
-                        </h2>
-                        <p class="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                            هذه نسخة Dashboard بتصميم Laravel الكلاسيكي. يمكنك إدارة المستخدمين، الدورات، البرامج، والمجلة الإعلامية من القائمة الجانبية.
-                        </p>
-                    </Card>
                     </div>
                 </main>
             </div>

@@ -16,11 +16,11 @@ class LoginResponse implements LoginResponseContract
         $user = $request->user();
         $user->load('roles');
 
-        if ($user->hasRole('admin')) {
+        if ($user->hasRole('admin') || $user->hasRole('admin_staff')) {
             return Inertia::location(route('admin.dashboard'));
         }
 
-        if ($user->hasRole('trainer')) {
+        if ($user->hasRole('teacher')) {
             return Inertia::location(route('instructor.dashboard'));
         }
 

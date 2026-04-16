@@ -75,6 +75,11 @@ class User extends Authenticatable
         return $this->hasMany(ScientificArticle::class);
     }
 
+    public function digitalBooks(): HasMany
+    {
+        return $this->hasMany(DigitalBook::class);
+    }
+
     protected static function booted(): void
     {
         static::saved(function (User $user): void {

@@ -9,15 +9,15 @@ use Illuminate\Support\Facades\Hash;
 class TrainerSeeder extends Seeder
 {
     /**
-     * إنشاء حساب المدرب للدخول إلى لوحة المدرب.
-     * البريد: trainer@gmail.com | كلمة المرور: password123
+     * إنشاء حساب الأكاديمي للدخول إلى لوحة الأكاديمي.
+     * البريد: teacher@gmail.com | كلمة المرور: password123
      */
     public function run(): void
     {
         $trainer = User::firstOrCreate(
-            ['email' => 'trainer@gmail.com'],
+            ['email' => 'teacher@gmail.com'],
             [
-                'name' => 'المدرب',
+                'name' => 'الأكاديمي',
                 'password' => Hash::make('password123'),
             ]
         );
@@ -26,7 +26,7 @@ class TrainerSeeder extends Seeder
             $trainer->update(['password' => Hash::make('password123')]);
         }
 
-        $trainer->syncRoles(['trainer']);
-        $trainer->update(['role' => 'trainer']);
+        $trainer->syncRoles(['teacher']);
+        $trainer->update(['role' => 'teacher']);
     }
 }

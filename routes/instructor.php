@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 /*
 |--------------------------------------------------------------------------
 | Instructor Dashboard Routes
-| All under /instructor, middleware: auth, verified, role:trainer
+| All under /instructor, middleware: auth, verified, role:teacher
 |--------------------------------------------------------------------------
 */
 

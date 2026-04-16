@@ -11,11 +11,11 @@ class DashboardDispatcherController extends Controller
     {
         $user = $request->user();
 
-        if ($user->hasRole('admin')) {
+        if ($user->hasRole('admin') || $user->hasRole('admin_staff')) {
             return redirect()->route('admin.dashboard');
         }
 
-        if ($user->hasRole('trainer')) {
+        if ($user->hasRole('teacher')) {
             return redirect()->route('instructor.dashboard');
         }
 

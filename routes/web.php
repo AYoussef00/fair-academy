@@ -1,13 +1,20 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminCoursesController;
+use App\Http\Controllers\Admin\AdminDigitalBooksController;
 use App\Http\Controllers\Admin\AdminMediaJournalController;
+use App\Http\Controllers\Admin\AdminProgramsController;
+use App\Http\Controllers\Admin\AdminStudentsController;
+use App\Http\Controllers\Admin\AdminUsersController;
 use App\Http\Controllers\Admin\CyberSecurityController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardDispatcherController;
+use App\Http\Controllers\DigitalLibraryController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\ScientificJournalController;
 use App\Http\Controllers\Student\StudentAssignmentsController;
 use App\Http\Controllers\Student\StudentAttendanceController;
@@ -22,8 +29,10 @@ use Laravel\Fortify\Features;
 Route::get('/', LandingController::class)->name('home');
 
 Route::get('/course/{id}', [CourseController::class, 'show'])->name('course.show');
-Route::inertia('/courses', 'Courses')->name('courses');
+Route::get('/courses', [CourseController::class, 'index'])->name('courses');
+Route::get('/programs', [ProgramController::class, 'index'])->name('programs');
 Route::get('/scientific-journal', [ScientificJournalController::class, 'index'])->name('scientific-journal');
+Route::get('/digital-library', [DigitalLibraryController::class, 'index'])->name('digital-library');
 
 Route::inertia('/welcome', 'Welcome', [
     'canRegister' => Features::enabled(Features::registration()),
@@ -65,7 +74,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
      * Instructor dashboard (Blade views)
      */
     Route::group([
-        'middleware' => ['role:trainer'],
+        'middleware' => ['role:teacher'],
         'prefix' => 'instructor',
         'as' => 'instructor.',
     ], base_path('routes/instructor.php'));
@@ -73,8 +82,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     /*
      * Admin dashboard + إدارة الأقسام (يضيفها الأدمن فقط)
      */
-    Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware(['role:admin|admin_staff'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
+        Route::get('/users', [AdminUsersController::class, 'index'])->name('users.index');
+        Route::post('/users', [AdminUsersController::class, 'store'])->name('users.store');
+        Route::get('/students', [AdminStudentsController::class, 'index'])->name('students.index');
+        Route::get('/courses', [AdminCoursesController::class, 'index'])->name('courses.index');
+        Route::get('/programs', [AdminProgramsController::class, 'index'])->name('programs.index');
+        Route::get('/digital-books', [AdminDigitalBooksController::class, 'index'])->name('digital-books.index');
+        Route::patch('/digital-books/{digitalBook}/approve', [AdminDigitalBooksController::class, 'approve'])->name('digital-books.approve');
+        Route::patch('/digital-books/{digitalBook}/reject', [AdminDigitalBooksController::class, 'reject'])->name('digital-books.reject');
         Route::get('/media-journal', [AdminMediaJournalController::class, 'index'])->name('media-journal.index');
         Route::patch('/media-journal/{article}/approve', [AdminMediaJournalController::class, 'approve'])->name('media-journal.approve');
         Route::patch('/media-journal/{article}/reject', [AdminMediaJournalController::class, 'reject'])->name('media-journal.reject');
@@ -90,7 +107,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
      * Cybersecurity dashboard (SOC) — admin only
      */
     Route::get('/cyber', [CyberSecurityController::class, 'index'])
-        ->middleware(['auth', 'role:admin'])
+        ->middleware(['auth', 'role:admin|admin_staff'])
         ->name('cyber.dashboard');
 
     /*
@@ -114,6 +131,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/course/{course}/module/{module}', [CourseController::class, 'showModule'])->name('course.module');
     Route::post('/scientific-journal/submissions', [ScientificJournalController::class, 'store'])
         ->name('scientific-journal.submissions.store')
+        ->middleware('throttle:uploads');
+    Route::post('/digital-library/books', [DigitalLibraryController::class, 'store'])
+        ->name('digital-library.books.store')
         ->middleware('throttle:uploads');
 });
 

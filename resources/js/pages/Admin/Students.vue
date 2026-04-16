@@ -10,7 +10,6 @@ import {
     LayoutDashboard,
     Newspaper,
     UserRound,
-    Users,
 } from 'lucide-vue-next';
 import { Card } from '@/components/ui/card';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -20,29 +19,29 @@ import type { BreadcrumbItem } from '@/types';
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'لوحة التحكم', href: dashboard() },
     { title: 'لوحة المدير', href: '/admin/dashboard' },
+    { title: 'الطلاب', href: '/admin/students' },
 ];
 
 const props = withDefaults(
     defineProps<{
-        stats?: {
-            usersCount: number;
-            coursesCount: number;
-            programsCount: number;
-        };
+        students?: Array<{
+            id: number;
+            name: string;
+            email: string;
+            phone?: string | null;
+            status?: string | null;
+            created_at?: string | null;
+        }>;
     }>(),
     {
-        stats: () => ({
-            usersCount: 0,
-            coursesCount: 0,
-            programsCount: 0,
-        }),
+        students: () => [],
     }
 );
 
 const sidebarItems = [
-    { title: 'لوحة التحكم', href: '/admin/dashboard', icon: LayoutDashboard, active: true },
+    { title: 'لوحة التحكم', href: '/admin/dashboard', icon: LayoutDashboard, active: false },
     { title: 'المستخدمين', href: '/admin/users', icon: UserRound, active: false },
-    { title: 'الطلاب', href: '/admin/students', icon: GraduationCap, active: false },
+    { title: 'الطلاب', href: '/admin/students', icon: GraduationCap, active: true },
     { title: 'الدورات', href: '/admin/courses', icon: BookOpen, active: false },
     { title: 'البرامج', href: '/admin/programs', icon: FolderOpen, active: false },
     { title: 'الكتب الرقمية', href: '/admin/digital-books', icon: BookText, active: false },
@@ -53,7 +52,7 @@ const sidebarItems = [
 </script>
 
 <template>
-    <Head title="لوحة المدير" />
+    <Head title="الطلاب - لوحة المدير" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="min-h-full bg-slate-100/70 dark:bg-slate-950">
@@ -106,65 +105,41 @@ const sidebarItems = [
 
                 <main class="min-w-0 flex-1">
                     <div class="w-full space-y-6 px-6 py-6">
-                    <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                        <h1 class="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-                            لوحة التحكم
-                        </h1>
-                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                            مرحبًا بك في لوحة إدارة المنصة.
-                        </p>
-                    </div>
+                        <div class="rounded-lg border border-slate-200 bg-white px-6 py-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                            <h1 class="text-2xl font-semibold text-slate-900 dark:text-slate-100">الطلاب</h1>
+                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                جميع الطلاب المسجلين في النظام.
+                            </p>
+                        </div>
 
-                    <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
-                        <Card class="border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-xs font-medium text-slate-500">إجمالي المستخدمين</p>
-                                    <p class="mt-1 text-3xl font-bold text-slate-900 dark:text-slate-100">
-                                        {{ props.stats.usersCount }}
-                                    </p>
-                                </div>
-                                <div class="rounded-lg bg-slate-100 p-2 dark:bg-slate-800">
-                                    <Users :size="20" class="text-slate-600 dark:text-slate-300" />
-                                </div>
+                        <Card class="overflow-hidden border-slate-200 bg-white p-0 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                            <div v-if="props.students.length === 0" class="p-8 text-center text-sm text-slate-500">
+                                لا يوجد طلاب مسجلون حالياً.
                             </div>
-                        </Card>
-                        <Card class="border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-xs font-medium text-slate-500">إجمالي الدورات</p>
-                                    <p class="mt-1 text-3xl font-bold text-slate-900 dark:text-slate-100">
-                                        {{ props.stats.coursesCount }}
-                                    </p>
-                                </div>
-                                <div class="rounded-lg bg-slate-100 p-2 dark:bg-slate-800">
-                                    <BookOpen :size="20" class="text-slate-600 dark:text-slate-300" />
-                                </div>
-                            </div>
-                        </Card>
-                        <Card class="border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-xs font-medium text-slate-500">إجمالي البرامج</p>
-                                    <p class="mt-1 text-3xl font-bold text-slate-900 dark:text-slate-100">
-                                        {{ props.stats.programsCount }}
-                                    </p>
-                                </div>
-                                <div class="rounded-lg bg-slate-100 p-2 dark:bg-slate-800">
-                                    <FolderOpen :size="20" class="text-slate-600 dark:text-slate-300" />
-                                </div>
-                            </div>
-                        </Card>
-                    </div>
 
-                    <Card class="mt-6 border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                        <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                            You're logged in!
-                        </h2>
-                        <p class="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                            هذه نسخة Dashboard بتصميم Laravel الكلاسيكي. يمكنك إدارة المستخدمين، الدورات، البرامج، والمجلة الإعلامية من القائمة الجانبية.
-                        </p>
-                    </Card>
+                            <div v-else class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
+                                    <thead class="bg-slate-50 dark:bg-slate-900/60">
+                                        <tr>
+                                            <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">الاسم</th>
+                                            <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">البريد الإلكتروني</th>
+                                            <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">الهاتف</th>
+                                            <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">الحالة</th>
+                                            <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">تاريخ التسجيل</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                                        <tr v-for="student in props.students" :key="student.id">
+                                            <td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">{{ student.name }}</td>
+                                            <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ student.email }}</td>
+                                            <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ student.phone || '—' }}</td>
+                                            <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ student.status || 'active' }}</td>
+                                            <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ student.created_at || '—' }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </Card>
                     </div>
                 </main>
             </div>

@@ -52,6 +52,7 @@ const navItems = [
     { title: 'الاختبارات', href: '/student/exams', icon: FileText },
     { title: 'الحضور والغياب', href: '/student/attendance', icon: Calendar },
     { title: 'المدفوعات والفواتير', href: '/student/payments', icon: Receipt },
+    { title: 'المكتبة الرقمية', href: '/digital-library', icon: BookOpen },
     { title: 'المقالات', href: '/scientific-journal', icon: Newspaper },
     { title: 'الملف الشخصي', href: '/student/profile', icon: User },
     { title: 'الرسائل والاشعارات', href: '#', icon: MessageSquare },

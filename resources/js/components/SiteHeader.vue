@@ -55,7 +55,7 @@ const logoHref = computed(() => home());
             <!-- Primary nav: Explore, Courses -->
             <nav class="hidden shrink-0 items-center gap-1 lg:flex">
                 <Link
-                    :href="home()"
+                    href="/programs"
                     class="rounded px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
                 >
                     البرامج
@@ -71,6 +71,12 @@ const logoHref = computed(() => home());
                     class="rounded px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
                 >
                     المجلة العلمية
+                </Link>
+                <Link
+                    href="/digital-library"
+                    class="rounded px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+                >
+                    المكتبة الرقمية
                 </Link>
             </nav>
 
@@ -191,7 +197,7 @@ const logoHref = computed(() => home());
                         </div>
                         <div class="mt-6 flex flex-col gap-2">
                             <Link
-                                :href="home()"
+                                href="/programs"
                                 class="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
                             >
                                 البرامج
@@ -207,6 +213,12 @@ const logoHref = computed(() => home());
                                 class="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
                             >
                                 المجلة العلمية
+                            </Link>
+                            <Link
+                                href="/digital-library"
+                                class="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                            >
+                                المكتبة الرقمية
                             </Link>
                             <Link
                                 v-if="authUser"

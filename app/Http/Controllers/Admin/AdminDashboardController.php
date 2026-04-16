@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Course;
+use App\Models\Program;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -13,9 +16,9 @@ class AdminDashboardController extends Controller
     {
         return Inertia::render('Admin/Dashboard', [
             'stats' => [
-                'usersCount' => 0,
-                'coursesCount' => 0,
-                'programsCount' => 0,
+                'usersCount' => User::query()->count(),
+                'coursesCount' => Course::query()->count(),
+                'programsCount' => Program::query()->count(),
             ],
         ]);
     }

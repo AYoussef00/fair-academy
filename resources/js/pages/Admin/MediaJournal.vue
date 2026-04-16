@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
 import {
+    BarChart3,
     BookOpen,
+    BookText,
     CheckCircle2,
+    CreditCard,
     FileText,
     FolderOpen,
+    GraduationCap,
     LayoutDashboard,
     Newspaper,
     UserRound,
@@ -53,10 +57,14 @@ const props = withDefaults(
 
 const sidebarItems = [
     { title: 'لوحة التحكم', href: '/admin/dashboard', icon: LayoutDashboard, active: false },
-    { title: 'المستخدمين', href: null, icon: UserRound, active: false },
-    { title: 'الدورات', href: null, icon: BookOpen, active: false },
-    { title: 'البرامج', href: null, icon: FolderOpen, active: false },
+    { title: 'المستخدمين', href: '/admin/users', icon: UserRound, active: false },
+    { title: 'الطلاب', href: '/admin/students', icon: GraduationCap, active: false },
+    { title: 'الدورات', href: '/admin/courses', icon: BookOpen, active: false },
+    { title: 'البرامج', href: '/admin/programs', icon: FolderOpen, active: false },
+    { title: 'الكتب الرقمية', href: '/admin/digital-books', icon: BookText, active: false },
     { title: 'المجلة الاعلامية', href: '/admin/media-journal', icon: Newspaper, active: true },
+    { title: 'المدفوعات', href: null, icon: CreditCard, active: false },
+    { title: 'التقارير', href: null, icon: BarChart3, active: false },
 ];
 
 function approveArticle(id: number) {
