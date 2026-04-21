@@ -43,6 +43,7 @@ class CourseController extends Controller
             ->find($courseId);
 
         if ($course) {
+            $user = $request->user();
             $lesson = Lesson::where('id', $lessonId)
                 ->whereHas('module', fn ($q) => $q->where('course_id', $courseId))
                 ->with('module')
@@ -50,6 +51,16 @@ class CourseController extends Controller
 
             if (! $lesson) {
                 abort(404);
+            }
+
+            $isEnrolled = $user
+                ? $course->enrollments()->where('user_id', $user->id)->exists()
+                : false;
+
+            if (! $isEnrolled && ! (bool) $lesson->is_free) {
+                return redirect()
+                    ->route('course.show', $courseId)
+                    ->with('error', 'اشترك في الدورة أولاً حتى تتمكن من مشاهدة جميع المحاضرات.');
             }
 
             $courseData = [
@@ -68,17 +79,22 @@ class CourseController extends Controller
                     ]),
                 ]),
             ];
+            $lessonVideoUrl = $lesson->video_url
+                ? (str_starts_with($lesson->video_url, 'http') ? SafeVideoUrl::forFrontend($lesson->video_url) : asset('storage/'.$lesson->video_url))
+                : null;
+
             $lessonData = [
                 'id' => $lesson->id,
                 'title' => $lesson->title,
                 'type' => $lesson->type,
-                'video_url' => SafeVideoUrl::forFrontend($lesson->video_url),
+                'video_url' => $lessonVideoUrl,
+                'is_embedded_video' => $lesson->video_url ? str_starts_with($lesson->video_url, 'http') : false,
                 'content' => HtmlSanitizer::sanitize($lesson->content),
                 'duration' => $lesson->duration,
             ];
 
             $lessonIds = $course->modules->pluck('lessons')->flatten()->pluck('id');
-            $completedLessonIds = $request->user()
+            $completedLessonIds = $user
                 ? \App\Models\LessonProgress::where('user_id', $request->user()->id)
                     ->whereIn('lesson_id', $lessonIds)
                     ->where('completed', true)

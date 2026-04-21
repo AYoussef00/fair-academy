@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, router } from '@inertiajs/vue3';
-import { LogOut, Settings } from 'lucide-vue-next';
+import { BookOpen, LogOut, Receipt } from 'lucide-vue-next';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -8,8 +8,7 @@ import {
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import UserInfo from '@/components/UserInfo.vue';
-import { logout } from '@/routes';
-import { edit } from '@/routes/profile';
+import { dashboard, logout } from '@/routes';
 import type { User } from '@/types';
 
 type Props = {
@@ -25,16 +24,28 @@ defineProps<Props>();
 
 <template>
     <DropdownMenuLabel class="p-0 font-normal">
-        <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
-            <UserInfo :user="user" :show-email="true" />
-        </div>
+        <Link
+            :href="dashboard()"
+            class="block rounded-md px-1 py-1.5 text-start text-sm transition hover:bg-slate-50"
+            prefetch
+        >
+            <div class="flex items-center gap-2">
+                <UserInfo :user="user" :show-email="true" />
+            </div>
+        </Link>
     </DropdownMenuLabel>
     <DropdownMenuSeparator />
     <DropdownMenuGroup>
         <DropdownMenuItem :as-child="true">
-            <Link class="block w-full cursor-pointer" :href="edit()" prefetch>
-                <Settings class="me-2 h-4 w-4" />
-                الإعدادات
+            <Link class="block w-full cursor-pointer" href="/my-books" prefetch>
+                <BookOpen class="me-2 h-4 w-4" />
+                الكتب
+            </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem :as-child="true">
+            <Link class="block w-full cursor-pointer" href="/my-invoices" prefetch>
+                <Receipt class="me-2 h-4 w-4" />
+                الفواتير
             </Link>
         </DropdownMenuItem>
     </DropdownMenuGroup>

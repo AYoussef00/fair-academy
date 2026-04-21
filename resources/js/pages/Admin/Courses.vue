@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import {
     BarChart3,
     BookOpen,
@@ -40,6 +40,10 @@ const props = withDefaults(
         courses: () => [],
     }
 );
+
+function toggleStatus(courseId: number) {
+    router.patch(`/admin/courses/${courseId}/toggle-status`);
+}
 
 const sidebarItems = [
     { title: 'لوحة التحكم', href: '/admin/dashboard', icon: LayoutDashboard, active: false },
@@ -105,13 +109,31 @@ const sidebarItems = [
                 <main class="min-w-0 flex-1">
                     <div class="w-full space-y-6 px-6 py-6">
                         <div class="rounded-lg border border-slate-200 bg-white px-6 py-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                            <h1 class="text-2xl font-semibold text-slate-900 dark:text-slate-100">الدورات</h1>
-                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">جدول بجميع الدورات في النظام وعدد الطلاب في كل دورة.</p>
+                            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <h1 class="text-2xl font-semibold text-slate-900 dark:text-slate-100">الدورات</h1>
+                                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">جدول بجميع الدورات في النظام وعدد الطلاب في كل دورة.</p>
+                                </div>
+                                <Link
+                                    href="/admin/courses/create"
+                                    class="inline-flex items-center justify-center rounded-xl bg-[#ed9134] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#d67d2a]"
+                                >
+                                    إضافة دورة جديدة
+                                </Link>
+                            </div>
                         </div>
 
                         <Card class="overflow-hidden border-slate-200 bg-white p-0 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                             <div v-if="props.courses.length === 0" class="p-8 text-center text-sm text-slate-500">
                                 لا توجد دورات حالياً.
+                                <div class="mt-4">
+                                    <Link
+                                        href="/admin/courses/create"
+                                        class="inline-flex items-center justify-center rounded-xl bg-[#ed9134] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#d67d2a]"
+                                    >
+                                        إضافة أول دورة
+                                    </Link>
+                                </div>
                             </div>
                             <div v-else class="overflow-x-auto">
                                 <table class="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
@@ -123,6 +145,7 @@ const sidebarItems = [
                                             <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">السعر</th>
                                             <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">عدد الطلاب</th>
                                             <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">الحالة</th>
+                                            <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">الإجراء</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -132,7 +155,21 @@ const sidebarItems = [
                                             <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ course.instructor || '—' }}</td>
                                             <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ course.price.toFixed(2) }} ر.س</td>
                                             <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ course.students_count }}</td>
-                                            <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ course.status || 'draft' }}</td>
+                                            <td class="px-4 py-3 text-slate-600 dark:text-slate-300">
+                                                {{ course.status || 'draft' }}
+                                            </td>
+                                            <td class="px-4 py-3">
+                                                <button
+                                                    type="button"
+                                                    class="inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold text-white transition"
+                                                    :class="course.status === 'published'
+                                                        ? 'bg-rose-600 hover:bg-rose-700'
+                                                        : 'bg-emerald-600 hover:bg-emerald-700'"
+                                                    @click="toggleStatus(course.id)"
+                                                >
+                                                    {{ course.status === 'published' ? 'إيقاف' : 'نشر' }}
+                                                </button>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>

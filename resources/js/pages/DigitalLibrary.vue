@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { BookOpen } from 'lucide-vue-next';
 import { ref } from 'vue';
 import SiteHeader from '@/components/SiteHeader.vue';
@@ -11,6 +11,7 @@ type DigitalBook = {
     purchase_count: number;
     cover?: string | null;
     status?: string;
+    is_purchased?: boolean;
 };
 
 const props = withDefaults(
@@ -27,10 +28,18 @@ const props = withDefaults(
 const fallbackCover = 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=800&q=80';
 const showLoginPopup = ref(false);
 
-function handleBookClick() {
+function openBookDetails(bookId: number) {
+    router.visit(`/digital-library/books/${bookId}`);
+}
+
+function addBookToCart(bookId: number) {
     if (!props.isAuthenticated) {
         showLoginPopup.value = true;
+
+        return;
     }
+
+    router.post(`/cart/add-book/${bookId}`, {}, { preserveScroll: true });
 }
 </script>
 
@@ -77,24 +86,59 @@ function handleBookClick() {
                     v-for="book in props.approvedBooks"
                     :key="book.id"
                     class="cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-                    @click="handleBookClick"
+                    @click="openBookDetails(book.id)"
                 >
-                    <img
-                        :src="book.cover || fallbackCover"
-                        :alt="book.title"
-                        class="h-56 w-full object-cover"
-                    />
+                    <Link :href="`/digital-library/books/${book.id}`" class="block" @click.stop>
+                        <img
+                            :src="book.cover || fallbackCover"
+                            :alt="book.title"
+                            class="h-56 w-full object-cover"
+                        />
+                    </Link>
 
                     <div class="space-y-3 p-5">
-                        <h3 class="line-clamp-2 text-lg font-bold leading-snug text-slate-900">
+                        <p
+                            v-if="book.is_purchased"
+                            class="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700"
+                        >
+                            تم شراء هذا الكتاب
+                        </p>
+                        <Link
+                            :href="`/digital-library/books/${book.id}`"
+                            class="block line-clamp-2 text-lg font-bold leading-snug text-slate-900 transition hover:text-[#ed9134]"
+                            @click.stop
+                        >
                             {{ book.title }}
-                        </h3>
+                        </Link>
                         <p class="text-lg font-extrabold text-[#ed9134]">
                             {{ book.price.toFixed(2) }} ر.س
                         </p>
                         <p class="text-xs font-medium text-slate-500">
                             عدد مرات الشراء: {{ book.purchase_count }}
                         </p>
+                        <div class="flex items-center gap-3 pt-1">
+                            <span
+                                v-if="book.is_purchased"
+                                class="inline-flex flex-1 items-center justify-center rounded-xl bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-700"
+                            >
+                                تم الشراء
+                            </span>
+                            <button
+                                v-else
+                                type="button"
+                                class="inline-flex flex-1 items-center justify-center rounded-xl bg-[#ed9134] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#d67d2a]"
+                                @click.stop="addBookToCart(book.id)"
+                            >
+                                أضف للسلة
+                            </button>
+                            <Link
+                                :href="`/digital-library/books/${book.id}`"
+                                class="inline-flex items-center justify-center rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                                @click.stop
+                            >
+                                تصفح
+                            </Link>
+                        </div>
                     </div>
                 </article>
             </div>
@@ -109,7 +153,7 @@ function handleBookClick() {
                     تسجيل الدخول مطلوب
                 </h3>
                 <p class="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-slate-600 sm:text-[1.65rem]">
-                    للوصول إلى تفاصيل الكتاب وإتمام الشراء، يرجى تسجيل الدخول أولاً.
+                    لإضافة الكتاب إلى السلة وإتمام الشراء، يرجى تسجيل الدخول أولاً.
                 </p>
 
                 <div class="mt-8 flex flex-wrap items-center justify-center gap-4">

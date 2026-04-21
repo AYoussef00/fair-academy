@@ -13,6 +13,8 @@ class Order extends Model
 
     protected $fillable = [
         'user_id',
+        'reference',
+        'description',
         'total',
         'status',
     ];
@@ -25,5 +27,10 @@ class Order extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
     }
 }

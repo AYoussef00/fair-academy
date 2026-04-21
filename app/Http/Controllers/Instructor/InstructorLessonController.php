@@ -10,6 +10,7 @@ use App\Models\Lesson;
 use App\Models\Module;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class InstructorLessonController extends Controller
@@ -20,11 +21,18 @@ class InstructorLessonController extends Controller
         $module = Module::where('id', $data['module_id'])->where('course_id', $course->id)->firstOrFail();
         $data['order_number'] = $data['order_number'] ?? ($module->lessons()->max('order_number') + 1);
         $data['is_free'] = $request->boolean('is_free', false);
+        unset($data['video']);
 
-        Lesson::create($data);
+        if ($request->hasFile('video')) {
+            $data['video_url'] = $request->file('video')->store('courses/lessons', 'public');
+        }
+
+        $lesson = Lesson::create($data);
 
         return redirect()->route('instructor.courses.builder', $course)
-            ->with('success', __('Lesson added.'));
+            ->with('success', __('Lesson added.'))
+            ->with('new_lesson_id', $lesson->id)
+            ->with('new_lesson_module_id', $module->id);
     }
 
     public function edit(Course $course, Lesson $lesson): View
@@ -49,6 +57,16 @@ class InstructorLessonController extends Controller
 
         $data = $request->validated();
         $data['is_free'] = $request->boolean('is_free', $lesson->is_free);
+        unset($data['video']);
+
+        if ($request->hasFile('video')) {
+            if ($lesson->video_url && ! str_starts_with($lesson->video_url, 'http')) {
+                Storage::disk('public')->delete($lesson->video_url);
+            }
+
+            $data['video_url'] = $request->file('video')->store('courses/lessons', 'public');
+        }
+
         $lesson->update($data);
 
         return redirect()->route('instructor.courses.builder', $course)
@@ -61,6 +79,10 @@ class InstructorLessonController extends Controller
         $lesson->load('module');
         if ((int) $lesson->module->course_id !== (int) $course->id) {
             abort(404);
+        }
+
+        if ($lesson->video_url && ! str_starts_with($lesson->video_url, 'http')) {
+            Storage::disk('public')->delete($lesson->video_url);
         }
 
         $lesson->delete();

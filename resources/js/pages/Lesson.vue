@@ -30,6 +30,7 @@ const props = defineProps<{
         title: string;
         type: string;
         video_url?: string | null;
+        is_embedded_video?: boolean;
         content?: string | null;
         duration?: number | null;
     };
@@ -129,7 +130,7 @@ function lessonUrl(lessonId: number) {
                     <Card class="overflow-hidden p-0">
                         <!-- Video -->
                         <div
-                            v-if="lesson.video_url"
+                            v-if="lesson.video_url && lesson.is_embedded_video"
                             class="relative aspect-video w-full bg-black"
                         >
                             <iframe
@@ -138,6 +139,18 @@ function lessonUrl(lessonId: number) {
                                 class="absolute inset-0 h-full w-full"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowfullscreen
+                            />
+                        </div>
+                        <div
+                            v-else-if="lesson.video_url"
+                            class="relative aspect-video w-full bg-black"
+                        >
+                            <video
+                                :src="lesson.video_url"
+                                controls
+                                controlsList="nodownload"
+                                playsinline
+                                class="absolute inset-0 h-full w-full"
                             />
                         </div>
                         <div

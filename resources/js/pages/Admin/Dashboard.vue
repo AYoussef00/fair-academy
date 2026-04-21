@@ -47,7 +47,7 @@ const sidebarItems = [
     { title: 'البرامج', href: '/admin/programs', icon: FolderOpen, active: false },
     { title: 'الكتب الرقمية', href: '/admin/digital-books', icon: BookText, active: false },
     { title: 'المجلة الاعلامية', href: '/admin/media-journal', icon: Newspaper, active: false },
-    { title: 'المدفوعات', href: null, icon: CreditCard, active: false },
+    { title: 'المدفوعات', href: '/admin/payments', icon: CreditCard, active: false },
     { title: 'التقارير', href: null, icon: BarChart3, active: false },
 ];
 </script>

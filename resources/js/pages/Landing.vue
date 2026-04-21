@@ -5,9 +5,7 @@ import {
     Award,
     Users,
     ArrowRight,
-    Play,
     CheckCircle2,
-    ChevronRight,
 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import ImageWithFallback from '@/components/ImageWithFallback.vue';
@@ -40,14 +38,14 @@ const props = defineProps<{
 
 const page = usePage();
 const authUser = (page.props.auth as { user?: unknown })?.user;
+const flash = computed(() => (page.props.flash as { success?: string | null; error?: string | null }) ?? {});
+const showSuccessPopup = ref(Boolean(flash.value.success));
 
 const categoriesList = computed(() => [
     { id: null as number | null, name: 'الكل' },
     ...(props.categories ?? []),
 ]);
 const selectedCategoryId = ref<number | null>(null);
-const coursesScrollRef = ref<HTMLElement | null>(null);
-const coursesScrollRef2 = ref<HTMLElement | null>(null);
 
 const filteredCourses = computed(() => {
     const list = props.courses ?? [];
@@ -57,21 +55,6 @@ const filteredCourses = computed(() => {
 });
 
 const programsList = computed(() => props.programs ?? []);
-
-function scrollCoursesRight() {
-    if (coursesScrollRef.value) {
-        const step = 320;
-        const direction = document.documentElement.dir === 'rtl' ? 1 : -1;
-        coursesScrollRef.value.scrollBy({ left: step * direction, behavior: 'smooth' });
-    }
-}
-function scrollCoursesRight2() {
-    if (coursesScrollRef2.value) {
-        const step = 320;
-        const direction = document.documentElement.dir === 'rtl' ? 1 : -1;
-        coursesScrollRef2.value.scrollBy({ left: step * direction, behavior: 'smooth' });
-    }
-}
 
 const features = [
     {
@@ -112,35 +95,60 @@ const benefits = [
 <template>
     <Head title="أكاديمية فايرير للتدريب والتعليم – تعلّم بلا حدود" />
 
-    <div class="min-h-screen bg-[#fafafa] text-slate-900">
+    <div class="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_22%,#f8fafc_100%)] text-slate-900">
         <SiteHeader />
 
+        <div
+            v-if="showSuccessPopup && flash.success"
+            class="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm"
+        >
+            <div class="w-full max-w-md rounded-[2rem] bg-white p-7 text-center shadow-2xl">
+                <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                    <CheckCircle2 class="h-9 w-9" />
+                </div>
+                <h2 class="mt-5 text-2xl font-bold text-slate-950">تم الدفع بنجاح</h2>
+                <p class="mt-3 text-sm leading-7 text-slate-600">
+                    {{ flash.success }}
+                </p>
+                <button
+                    type="button"
+                    class="mt-6 inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                    @click="showSuccessPopup = false"
+                >
+                    إغلاق
+                </button>
+            </div>
+        </div>
+
         <!-- Hero -->
-        <section class="relative overflow-hidden pb-16 pt-20 sm:pt-24 md:pb-24 md:pt-32">
+        <section class="relative overflow-hidden pb-18 pt-16 sm:pt-20 md:pb-28 md:pt-24">
             <div
-                class="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(139,92,246,0.12),transparent)]"
+                class="absolute inset-0 bg-[radial-gradient(ellipse_75%_55%_at_50%_-10%,rgba(237,145,52,0.12),transparent)]"
             />
             <div
-                class="absolute left-1/2 top-1/3 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-violet-400/15 blur-[120px]"
+                class="absolute left-1/2 top-1/3 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-slate-200/70 blur-[130px]"
             />
             <div class="relative mx-auto max-w-6xl px-4 text-center sm:px-6">
+                <div class="inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/80 px-4 py-2 text-xs font-semibold text-slate-600 shadow-sm backdrop-blur">
+                    <span class="h-2 w-2 rounded-full bg-[#ed9134]" />
+                    تجربة تعلّم أكثر هدوءًا واحترافية
+                </div>
                 <h1
-                    class="mx-auto max-w-4xl text-3xl font-extrabold leading-[1.2] tracking-tight text-slate-900 sm:text-4xl md:text-6xl lg:text-7xl"
+                    class="mx-auto mt-6 max-w-5xl text-4xl font-extrabold leading-[1.08] tracking-[-0.03em] text-slate-950 sm:text-5xl md:text-6xl lg:text-[5.2rem]"
                 >
                     أتقن مهارات جديدة مع
-                    <span style="color: #ed9134">
+                    <span class="text-[#ed9134]">
                         كورسات عالمية المستوى
                     </span>
                 </h1>
-                <p class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg md:text-xl">
+                <p class="mx-auto mt-6 max-w-3xl text-base leading-8 text-slate-600 sm:text-lg md:text-[1.35rem] md:leading-9">
                     انضمّ إلى آلاف المتعلمين. ادخل إلى كورسات يقدّمها خبراء، واحصل على شهادات، وطوّر مسيرتك من أي مكان.
                 </p>
-                <div class="mt-8 flex flex-col items-stretch justify-center gap-3 sm:mt-10 sm:flex-row sm:items-center sm:gap-4">
+                <div class="mt-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:gap-4">
                     <Link
                         v-if="!authUser"
                         :href="register()"
-                        class="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-base font-semibold text-white shadow-xl transition hover:opacity-95 sm:w-auto sm:px-8 sm:py-4"
-                        style="background-color: #ed9134; box-shadow: 0 20px 25px -5px rgb(237 145 52 / 0.3);"
+                        class="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-slate-950 px-6 py-4 text-base font-semibold text-white shadow-[0_20px_50px_rgba(15,23,42,0.18)] transition hover:bg-slate-800 sm:w-auto sm:px-8"
                     >
                         ابدأ التعلّم مجاناً
                         <ArrowRight
@@ -150,37 +158,45 @@ const benefits = [
                     <Link
                         v-else
                         :href="dashboard()"
-                        class="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-600 px-6 py-3.5 text-base font-semibold text-white shadow-xl shadow-violet-500/30 transition hover:shadow-violet-500/50 sm:w-auto sm:px-8 sm:py-4"
+                        class="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-slate-950 px-6 py-4 text-base font-semibold text-white shadow-[0_20px_50px_rgba(15,23,42,0.18)] transition hover:bg-slate-800 sm:w-auto sm:px-8"
                     >
                         لوحة التحكم
                         <ArrowRight
                             class="h-5 w-5 transition group-hover:-translate-x-1 rtl:group-hover:translate-x-1"
                         />
                     </Link>
-                    <a
-                        href="#how-it-works"
-                        class="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3.5 text-base font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 sm:w-auto sm:px-8 sm:py-4"
-                    >
-                        <Play class="h-5 w-5" />
-                        اعرف كيف يعمل
-                    </a>
+                </div>
+
+                <div class="mx-auto mt-12 grid max-w-4xl gap-3 sm:grid-cols-3">
+                    <div class="rounded-[1.75rem] border border-white/80 bg-white/75 px-5 py-4 text-start shadow-sm backdrop-blur">
+                        <p class="text-xs font-semibold text-slate-500">تعليم مرن</p>
+                        <p class="mt-2 text-sm leading-7 text-slate-700">تعلم من أي مكان وارجع للمحتوى متى شئت.</p>
+                    </div>
+                    <div class="rounded-[1.75rem] border border-white/80 bg-white/75 px-5 py-4 text-start shadow-sm backdrop-blur">
+                        <p class="text-xs font-semibold text-slate-500">خبرة عملية</p>
+                        <p class="mt-2 text-sm leading-7 text-slate-700">دورات وبرامج مصممة لتطوير مهاراتك فعليًا.</p>
+                    </div>
+                    <div class="rounded-[1.75rem] border border-white/80 bg-white/75 px-5 py-4 text-start shadow-sm backdrop-blur">
+                        <p class="text-xs font-semibold text-slate-500">شهادات معتمدة</p>
+                        <p class="mt-2 text-sm leading-7 text-slate-700">وثّق إنجازك وشارك مسيرتك المهنية بثقة.</p>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Stats -->
-        <section class="border-y border-slate-200 bg-white py-10 sm:py-12">
+        <section class="py-6 sm:py-8">
             <div class="mx-auto max-w-6xl px-4 sm:px-6">
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-8">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
                     <div
                         v-for="(stat, i) in stats"
                         :key="i"
-                        class="text-center"
+                        class="rounded-[2rem] border border-white/80 bg-white/85 px-6 py-7 text-center shadow-sm backdrop-blur"
                     >
-                        <p class="text-3xl font-bold text-slate-900 md:text-4xl">
+                        <p class="text-3xl font-extrabold tracking-tight text-slate-950 md:text-4xl">
                             {{ stat.value }}
                         </p>
-                        <p class="mt-1 text-sm font-medium text-slate-500">
+                        <p class="mt-2 text-sm font-medium text-slate-500">
                             {{ stat.label }}
                         </p>
                     </div>
@@ -189,25 +205,27 @@ const benefits = [
         </section>
 
         <!-- Skills to transform your career -->
-        <section class="border-t border-slate-200 bg-white py-12 md:py-20">
+        <section class="py-14 md:py-24">
             <div class="mx-auto max-w-6xl px-4 sm:px-6">
-                <h2 class="text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
+                <div class="mb-8 flex flex-col items-center gap-3 text-center md:mb-10">
+                    <div>
+                        <p class="text-sm font-semibold tracking-[0.18em] text-[#ed9134]">الدورات</p>
+                        <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl md:text-[2.75rem]">
                     دورات تُغيّر مسيرتك وحياتك
-                </h2>
-                <p class="mt-2 text-base text-gray-600 sm:text-lg">
-                    من المهارات الحرجة إلى المواضيع التقنية، أكاديمية فايرير للتدريب والتعليم تدعم تطوّرك المهني.
-                </p>
+                        </h2>
+                    </div>
+                </div>
 
                 <!-- Category tabs (from DB) -->
-                <div class="mt-8 flex gap-4 overflow-x-auto border-b border-gray-200 pb-1 whitespace-nowrap">
+                <div class="mt-8 flex flex-wrap justify-center gap-3">
                     <button
                         v-for="cat in categoriesList"
                         :key="cat.id"
                         type="button"
-                        class="shrink-0 pb-3 text-sm font-medium transition hover:text-gray-900"
+                        class="shrink-0 rounded-full border px-4 py-2.5 text-sm font-medium transition"
                         :class="selectedCategoryId === cat.id
-                            ? 'border-b-2 border-gray-900 text-gray-900'
-                            : 'text-gray-500'"
+                            ? 'border-slate-950 bg-slate-950 text-white shadow-lg shadow-slate-950/10'
+                            : 'border-white/80 bg-white text-slate-500 hover:text-slate-900'"
                         @click="selectedCategoryId = cat.id"
                     >
                         {{ cat.name }}
@@ -215,66 +233,69 @@ const benefits = [
                 </div>
 
                 <!-- Course cards: horizontal scroll (from DB) -->
-                <div class="relative mt-8">
+                <div class="mt-8">
                     <p
                         v-if="filteredCourses.length === 0"
-                        class="rounded-xl border border-dashed border-slate-200 bg-slate-50 py-8 text-center text-slate-500"
+                        class="rounded-[2rem] border border-dashed border-slate-200 bg-white py-10 text-center text-slate-500 shadow-sm"
                     >
                         لا توجد دورات حتى الآن.
                     </p>
                     <div
                         v-else
-                        ref="coursesScrollRef"
-                        class="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 ps-1 scroll-smooth sm:gap-6 scrollbar-thin"
-                        style="scrollbar-width: none; -ms-overflow-style: none"
+                        class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
                     >
-                        <div
+                        <Link
                             v-for="course in filteredCourses"
                             :key="course.id"
-                            class="min-w-[250px] max-w-[250px] shrink-0 snap-start rounded-lg bg-white shadow-sm transition hover:shadow-md sm:min-w-[280px] sm:max-w-[280px]"
+                            :href="`/course/${course.id}`"
+                            class="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)]"
                         >
-                            <Link :href="`/course/${course.id}`" class="block">
+                            <div class="relative overflow-hidden">
                                 <ImageWithFallback
                                     :src="course.thumbnail ? `/storage/${course.thumbnail}` : undefined"
                                     :alt="course.title"
-                                    class="h-40 w-full rounded-t-lg object-cover"
+                                    class="h-56 w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                                 />
-                                <div class="p-4">
-                                    <div class="flex items-center gap-2">
-                                        <h3 class="line-clamp-2 flex-1 text-base font-semibold text-gray-900">
-                                            {{ course.title }}
-                                        </h3>
-                                        <span
-                                            v-if="course.status === 'draft'"
-                                            class="shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-800"
-                                        >
-                                            مسودة
+                                <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-950/35 to-transparent" />
+                            </div>
+                            <div class="flex flex-1 flex-col p-5 sm:p-6">
+                                <div class="mb-3 flex items-center justify-between gap-3">
+                                    <div class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
+                                        {{ course.category_name || 'دورة احترافية' }}
+                                    </div>
+                                    <span
+                                        v-if="course.status === 'draft'"
+                                        class="shrink-0 rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-semibold text-amber-800"
+                                    >
+                                        مسودة
+                                    </span>
+                                </div>
+                                <h3 class="line-clamp-2 text-lg font-bold leading-8 text-slate-950">
+                                    {{ course.title }}
+                                </h3>
+                                <p class="mt-3 text-sm leading-7 text-slate-600">
+                                    المدرب: {{ course.instructor }}
+                                </p>
+                                <div class="mt-auto flex items-end justify-between gap-4 pt-6">
+                                    <div>
+                                        <p class="text-xs font-medium text-slate-400">السعر</p>
+                                        <span class="mt-1 block text-xl font-extrabold tracking-tight text-slate-950">
+                                            {{ course.price > 0 ? `${course.price.toFixed(2)} ر.س` : 'مجاني' }}
                                         </span>
                                     </div>
-                                    <p class="mt-1 text-sm text-gray-600">
-                                        {{ course.instructor }}
-                                    </p>
-                                    <div class="mt-2 flex items-baseline gap-2">
-                                        <span class="font-bold text-gray-900">{{ course.price > 0 ? `$${course.price.toFixed(2)}` : 'مجاني' }}</span>
-                                    </div>
+                                    <span class="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition group-hover:bg-[#ed9134]">
+                                        تصفح الدورة
+                                        <ArrowRight class="h-4 w-4" />
+                                    </span>
                                 </div>
-                            </Link>
-                        </div>
+                            </div>
+                        </Link>
                     </div>
-                    <button
-                        v-if="filteredCourses.length > 0"
-                        type="button"
-                        class="absolute -right-3 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white shadow-md transition hover:bg-gray-50 md:flex"
-                        aria-label="Scroll right"
-                        @click="scrollCoursesRight"
-                    >
-                        <ChevronRight class="h-6 w-6 text-gray-700" />
-                    </button>
                 </div>
 
                 <Link
                     :href="coursesRoute()"
-                    class="mt-6 inline-flex items-center gap-1 text-sm font-medium text-violet-600 hover:text-violet-700"
+                    class="mt-8 inline-flex items-center gap-1 text-sm font-semibold text-slate-900 hover:text-[#ed9134]"
                 >
                     عرض كل الدورات
                     <ArrowRight class="h-4 w-4" />
@@ -283,68 +304,73 @@ const benefits = [
         </section>
 
         <!-- Programs section: برامج فقط -->
-        <section class="border-t border-slate-200 bg-white py-12 md:py-20">
+        <section class="py-14 md:py-24">
             <div class="mx-auto max-w-6xl px-4 sm:px-6">
-                <h2 class="text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
+                <div class="mb-8 flex flex-col items-center gap-3 text-center md:mb-10">
+                    <div>
+                        <p class="text-sm font-semibold tracking-[0.18em] text-[#ed9134]">البرامج</p>
+                        <h2 class="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl md:text-[2.75rem]">
                     برامج تُغيّر مسيرتك وحياتك المهنية
-                </h2>
-                <p class="mt-2 text-base text-gray-600 sm:text-lg">
-                    من المهارات الحرجة إلى المواضيع التقنية، أكاديمية فايرير للتدريب والتعليم تدعم تطوّرك المهني.
-                </p>
+                        </h2>
+                    </div>
+                </div>
 
-                <!-- Program cards: horizontal scroll (برامج من DB فقط) -->
-                <div class="relative mt-8">
+                <!-- Program cards: responsive grid -->
+                <div class="mt-8">
                     <p
                         v-if="programsList.length === 0"
-                        class="rounded-xl border border-dashed border-slate-200 bg-slate-50 py-8 text-center text-slate-500"
+                        class="rounded-[2rem] border border-dashed border-slate-200 bg-white py-10 text-center text-slate-500 shadow-sm"
                     >
                         لا توجد برامج حتى الآن.
                     </p>
                     <div
                         v-else
-                        ref="coursesScrollRef2"
-                        class="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 ps-1 scroll-smooth sm:gap-6 scrollbar-thin"
-                        style="scrollbar-width: none; -ms-overflow-style: none"
+                        class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
                     >
-                        <div
+                        <Link
                             v-for="program in programsList"
                             :key="'program-' + program.id"
-                            class="min-w-[250px] max-w-[250px] shrink-0 snap-start rounded-lg bg-white shadow-sm transition hover:shadow-md sm:min-w-[280px] sm:max-w-[280px]"
+                            href="/programs"
+                            class="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(15,23,42,0.12)]"
                         >
-                            <Link :href="home()" class="block">
+                            <div class="relative overflow-hidden">
                                 <ImageWithFallback
                                     :src="program.thumbnail ? (program.thumbnail.startsWith('http') ? program.thumbnail : `/storage/${program.thumbnail}`) : undefined"
                                     :alt="program.title"
-                                    class="h-40 w-full rounded-t-lg object-cover"
+                                    class="h-56 w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                                 />
-                                <div class="p-4">
-                                    <h3 class="line-clamp-2 text-base font-semibold text-gray-900">
-                                        {{ program.title }}
-                                    </h3>
-                                    <p class="mt-1 text-sm text-gray-600">
-                                        المدرب
-                                    </p>
-                                    <div class="mt-2 flex items-baseline gap-2">
-                                        <span class="font-bold text-gray-900">{{ program.price > 0 ? `$${program.price.toFixed(2)}` : 'مجاني' }}</span>
-                                    </div>
+                                <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-950/35 to-transparent" />
+                            </div>
+                            <div class="flex flex-1 flex-col p-5 sm:p-6">
+                                <div class="mb-3 inline-flex w-fit rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
+                                        {{ program.level || 'برنامج متخصص' }}
                                 </div>
-                            </Link>
-                        </div>
+                                <h3 class="line-clamp-2 text-lg font-bold leading-8 text-slate-950">
+                                    {{ program.title }}
+                                </h3>
+                                <p class="mt-3 text-sm leading-7 text-slate-600">
+                                    {{ program.duration || 'تجربة تعليمية متقدمة' }}
+                                </p>
+                                <div class="mt-auto flex items-end justify-between gap-4 pt-6">
+                                    <div>
+                                        <p class="text-xs font-medium text-slate-400">السعر</p>
+                                        <span class="mt-1 block text-xl font-extrabold tracking-tight text-slate-950">
+                                            {{ program.price > 0 ? `${program.price.toFixed(2)} ر.س` : 'مجاني' }}
+                                        </span>
+                                    </div>
+                                    <span class="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition group-hover:bg-[#ed9134]">
+                                        تصفح البرنامج
+                                        <ArrowRight class="h-4 w-4" />
+                                    </span>
+                                </div>
+                            </div>
+                        </Link>
                     </div>
-                    <button
-                        v-if="programsList.length > 0"
-                        type="button"
-                        class="absolute -right-3 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white shadow-md transition hover:bg-gray-50 md:flex"
-                        aria-label="Scroll right"
-                        @click="scrollCoursesRight2"
-                    >
-                        <ChevronRight class="h-6 w-6 text-gray-700" />
-                    </button>
                 </div>
 
                 <Link
-                    :href="home()"
-                    class="mt-6 inline-flex items-center gap-1 text-sm font-medium text-[#ed9134] hover:text-[#d67d2a]"
+                    href="/programs"
+                    class="mt-8 inline-flex items-center gap-1 text-sm font-semibold text-slate-900 hover:text-[#ed9134]"
                 >
                     عرض كل البرامج
                     <ArrowRight class="h-4 w-4" />
@@ -355,23 +381,23 @@ const benefits = [
         <!-- Features -->
         <section id="how-it-works" class="py-16 md:py-28">
             <div class="mx-auto max-w-6xl px-4 sm:px-6">
-                <p class="text-center text-sm font-semibold uppercase tracking-wider text-[#ed9134]">
+                <p class="text-center text-sm font-semibold uppercase tracking-[0.18em] text-[#ed9134]">
                     لماذا أكاديمية فايرير للتدريب والتعليم
                 </p>
-                <h2 class="mt-3 text-center text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">
+                <h2 class="mt-4 text-center text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl md:text-[2.9rem]">
                     كل ما تحتاجه للنجاح
                 </h2>
-                <p class="mx-auto mt-4 max-w-2xl text-center text-slate-600">
+                <p class="mx-auto mt-4 max-w-2xl text-center text-base leading-8 text-slate-600">
                     منصّة تدعم رحلة تعلّمك من البداية حتى النهاية.
                 </p>
                 <div class="mt-10 grid gap-5 md:mt-16 md:grid-cols-3 md:gap-8">
                     <div
                         v-for="(feature, i) in features"
                         :key="i"
-                        class="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-[#ed9134]/40 hover:shadow-md md:p-8"
+                        class="group rounded-[2rem] border border-white/80 bg-white/90 p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(15,23,42,0.08)] md:p-8"
                     >
                         <div
-                            class="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-[#ed9134]/15 text-[#ed9134] transition group-hover:scale-105"
+                            class="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-[#ed9134] transition group-hover:scale-105"
                         >
                             <component :is="feature.icon" class="h-7 w-7" />
                         </div>
@@ -390,26 +416,29 @@ const benefits = [
         <section class="py-16 md:py-28">
             <div class="mx-auto max-w-6xl px-4 sm:px-6">
                 <div
-                    class="relative overflow-hidden rounded-3xl border border-violet-100 bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 p-6 shadow-lg sm:p-8 md:p-16"
+                    class="relative overflow-hidden rounded-[2.25rem] border border-slate-800 bg-[linear-gradient(135deg,#020617_0%,#0f172a_45%,#111827_100%)] p-6 text-white shadow-[0_30px_80px_rgba(15,23,42,0.3)] sm:p-8 md:p-16"
                 >
                     <div
-                        class="absolute right-0 top-0 h-64 w-64 rounded-full bg-violet-200/40 blur-[100px]"
+                        class="absolute right-0 top-0 h-64 w-64 rounded-full bg-[#ed9134]/20 blur-[110px]"
+                    />
+                    <div
+                        class="absolute bottom-0 left-10 h-56 w-56 rounded-full bg-white/10 blur-[120px]"
                     />
                     <div class="relative grid gap-8 md:grid-cols-2 md:items-center md:gap-12">
                         <div>
-                            <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl md:text-4xl">
+                            <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl md:text-[3rem]">
                                 مستعد لبدء التعلّم؟
                             </h2>
-                            <p class="mt-4 text-base text-slate-600 sm:text-lg">
+                            <p class="mt-4 text-base leading-8 text-slate-300 sm:text-lg">
                                 انضم إلى أكاديمية فايرير للتدريب والتعليم اليوم واحصل على مئات الكورسات ومدربين خبراء وشهادات معتمدة.
                             </p>
                             <ul class="mt-6 space-y-3">
                                 <li
                                     v-for="(benefit, i) in benefits"
                                     :key="i"
-                                    class="flex items-center gap-3 text-slate-700"
+                                    class="flex items-center gap-3 text-slate-200"
                                 >
-                                    <CheckCircle2 class="h-5 w-5 shrink-0 text-emerald-500" />
+                                    <CheckCircle2 class="h-5 w-5 shrink-0 text-[#ed9134]" />
                                     <span>{{ benefit }}</span>
                                 </li>
                             </ul>
@@ -418,19 +447,19 @@ const benefits = [
                             <template v-if="!authUser">
                                 <Link
                                     :href="register()"
-                                    class="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-600 px-6 py-3.5 text-base font-semibold text-white shadow-xl transition hover:shadow-violet-500/40 sm:w-auto sm:px-8 sm:py-4"
+                                    class="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-4 text-base font-semibold text-slate-950 shadow-xl transition hover:bg-slate-100 sm:w-auto sm:px-8"
                                 >
                                     إنشاء حساب مجاني
                                     <ArrowRight class="h-5 w-5" />
                                 </Link>
-                                <p class="mt-4 text-sm text-slate-500">
+                                <p class="mt-4 text-sm text-slate-400">
                                     لا حاجة لبطاقة ائتمان.
                                 </p>
                             </template>
                             <template v-else>
                                 <Link
                                     :href="dashboard()"
-                                    class="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-600 px-6 py-3.5 text-base font-semibold text-white shadow-xl transition hover:shadow-violet-500/40 sm:w-auto sm:px-8 sm:py-4"
+                                    class="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-4 text-base font-semibold text-slate-950 shadow-xl transition hover:bg-slate-100 sm:w-auto sm:px-8"
                                 >
                                     فتح لوحة التحكم
                                     <ArrowRight class="h-5 w-5" />
@@ -443,7 +472,7 @@ const benefits = [
         </section>
 
         <!-- Footer -->
-        <footer class="border-t border-slate-200 bg-slate-50">
+        <footer class="border-t border-slate-200 bg-white/70 backdrop-blur">
             <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14">
                 <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
                     <!-- Brand -->
@@ -455,7 +484,7 @@ const benefits = [
                                 class="h-12 w-auto object-contain md:h-14"
                             />
                         </Link>
-                        <p class="mt-4 max-w-xs text-sm leading-relaxed text-slate-600">
+                        <p class="mt-4 max-w-xs text-sm leading-7 text-slate-600">
                             تعلّم بلا حدود. أتقن مهارات جديدة مع كورسات يقدّمها خبراء واحصل على شهادات معتمدة.
                         </p>
                     </div>
@@ -467,17 +496,17 @@ const benefits = [
                         </h4>
                         <ul class="mt-4 space-y-3">
                             <li>
-                                <Link :href="authUser ? dashboard() : login()" class="text-sm text-slate-600 transition hover:text-violet-600">
+                                <Link :href="authUser ? dashboard() : login()" class="text-sm text-slate-600 transition hover:text-[#ed9134]">
                                     {{ authUser ? 'لوحة التحكم' : 'تسجيل الدخول' }}
                                 </Link>
                             </li>
                             <li>
-                                <Link :href="register()" class="text-sm text-slate-600 transition hover:text-violet-600">
+                                <Link :href="register()" class="text-sm text-slate-600 transition hover:text-[#ed9134]">
                                     إنشاء حساب
                                 </Link>
                             </li>
                             <li>
-                                <Link v-if="authUser" :href="dashboard()" class="text-sm text-slate-600 transition hover:text-violet-600">
+                                <Link v-if="authUser" :href="dashboard()" class="text-sm text-slate-600 transition hover:text-[#ed9134]">
                                     كورساتي
                                 </Link>
                             </li>
@@ -491,13 +520,13 @@ const benefits = [
                         </h4>
                         <ul class="mt-4 space-y-3">
                             <li>
-                                <a href="#" class="text-sm text-slate-600 transition hover:text-violet-600">من نحن</a>
+                                <a href="#" class="text-sm text-slate-600 transition hover:text-[#ed9134]">من نحن</a>
                             </li>
                             <li>
-                                <a href="#" class="text-sm text-slate-600 transition hover:text-violet-600">اتصل بنا</a>
+                                <a href="#" class="text-sm text-slate-600 transition hover:text-[#ed9134]">اتصل بنا</a>
                             </li>
                             <li>
-                                <a href="#" class="text-sm text-slate-600 transition hover:text-violet-600">الوظائف</a>
+                                <a href="#" class="text-sm text-slate-600 transition hover:text-[#ed9134]">الوظائف</a>
                             </li>
                         </ul>
                     </div>
@@ -509,13 +538,13 @@ const benefits = [
                         </h4>
                         <ul class="mt-4 space-y-3">
                             <li>
-                                <a href="#" class="text-sm text-slate-600 transition hover:text-violet-600">سياسة الخصوصية</a>
+                                <a href="#" class="text-sm text-slate-600 transition hover:text-[#ed9134]">سياسة الخصوصية</a>
                             </li>
                             <li>
-                                <a href="#" class="text-sm text-slate-600 transition hover:text-violet-600">الشروط والأحكام</a>
+                                <a href="#" class="text-sm text-slate-600 transition hover:text-[#ed9134]">الشروط والأحكام</a>
                             </li>
                             <li>
-                                <a href="#" class="text-sm text-slate-600 transition hover:text-violet-600">سياسة الكوكيز</a>
+                                <a href="#" class="text-sm text-slate-600 transition hover:text-[#ed9134]">سياسة الكوكيز</a>
                             </li>
                         </ul>
                     </div>

@@ -78,10 +78,39 @@
         @if($module->lessons->isNotEmpty())
             <ul class="divide-y divide-slate-100">
                 @foreach($module->lessons as $lesson)
-                    <li class="flex justify-between items-center px-5 py-3">
-                        <div>
-                            <span class="font-medium text-slate-800">{{ $lesson->title }}</span>
-                            <span class="text-sm text-slate-500 me-2">({{ $lesson->type }})</span>
+                    @php
+                        $isNewLesson = (int) session('new_lesson_id') === (int) $lesson->id;
+                        $lessonVideoSrc = $lesson->video_url ? (str_starts_with($lesson->video_url, 'http') ? $lesson->video_url : asset('storage/'.$lesson->video_url)) : null;
+                    @endphp
+                    <li id="lesson-{{ $lesson->id }}" class="flex justify-between items-start gap-4 px-5 py-4 {{ $isNewLesson ? 'bg-emerald-50/70' : '' }}">
+                        <div class="min-w-0">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="font-medium text-slate-800">{{ $lesson->title }}</span>
+                                <span class="text-sm text-slate-500">({{ $lesson->type }})</span>
+                                @if($lesson->is_free)
+                                    <span class="inline-flex rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">مجاني</span>
+                                @endif
+                                @if($isNewLesson)
+                                    <span class="inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">تمت إضافته الآن</span>
+                                @endif
+                            </div>
+                            <div class="mt-2 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                                @if($lesson->duration)
+                                    <span>المدة: {{ $lesson->duration }} دقيقة</span>
+                                @endif
+                                @if($lesson->video_url)
+                                    <span class="text-emerald-700">تم رفع فيديو لهذا الدرس</span>
+                                    <a href="{{ $lessonVideoSrc }}" target="_blank" rel="noopener" class="font-medium text-violet-600 hover:underline">عرض الفيديو</a>
+                                    @if(! str_starts_with($lesson->video_url, 'http'))
+                                        <span class="truncate">الملف: {{ basename($lesson->video_url) }}</span>
+                                    @endif
+                                @else
+                                    <span>لا يوجد فيديو مرفوع بعد</span>
+                                @endif
+                            </div>
+                            @if($isNewLesson)
+                                <p class="mt-2 text-xs font-medium text-emerald-700">يمكنك الآن إضافة درس فرعي آخر من النموذج بالأسفل.</p>
+                            @endif
                         </div>
                         <div class="flex gap-2">
                             <a href="{{ route('instructor.lessons.edit', [$course, $lesson]) }}" class="text-sm text-violet-600 hover:underline">تعديل</a>
@@ -97,8 +126,9 @@
         @endif
 
         <div class="border-t border-slate-100 bg-slate-50/50 p-4">
-            <p class="text-sm text-slate-600 mb-3">إضافة درس فرعي (اختياري) داخل هذا الموديول:</p>
-            <form action="{{ route('instructor.lessons.store', $course) }}" method="POST" class="space-y-3">
+            <p class="text-sm text-slate-600 mb-1">إضافة درس فرعي (اختياري) داخل هذا الموديول:</p>
+            <p class="mb-3 text-xs text-slate-500">بعد حفظ الدرس سيظهر مباشرة في القائمة أعلاه، ويمكنك استخدام نفس النموذج لإضافة درس فرعي آخر.</p>
+            <form action="{{ route('instructor.lessons.store', $course) }}" method="POST" enctype="multipart/form-data" class="space-y-3">
                 @csrf
                 <input type="hidden" name="module_id" value="{{ $module->id }}">
                 <div class="flex flex-wrap gap-2 items-end">
@@ -109,12 +139,13 @@
                         <option value="live">مباشر</option>
                         <option value="file">ملف</option>
                     </select>
-                    <input type="text" name="video_url" placeholder="رابط الفيديو" class="rounded-lg border border-slate-300 px-3 py-2 min-w-[180px]">
+                    <input type="file" name="video" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo" class="rounded-lg border border-slate-300 px-3 py-2 min-w-[220px] bg-white text-sm text-slate-600 file:me-3 file:rounded-lg file:border-0 file:bg-violet-50 file:px-4 file:py-2 file:font-medium file:text-violet-700 hover:file:bg-violet-100">
                     <input type="number" name="duration" placeholder="دقيقة" class="rounded-lg border border-slate-300 px-3 py-2 w-20">
                     <label class="flex items-center gap-1 text-sm text-slate-600"><input type="checkbox" name="is_free" value="1"> مجاني</label>
                     <button type="submit" class="rounded-lg bg-violet-600 text-white px-4 py-2 text-sm font-semibold hover:bg-violet-700">إضافة درس</button>
                 </div>
                 @error('title')<p class="text-red-500 text-sm">{{ $message }}</p>@enderror
+                @error('video')<p class="text-red-500 text-sm">{{ $message }}</p>@enderror
             </form>
         </div>
     </div>

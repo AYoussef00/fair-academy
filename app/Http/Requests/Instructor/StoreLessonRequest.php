@@ -26,23 +26,7 @@ class StoreLessonRequest extends FormRequest
             'module_id' => ['required', 'exists:modules,id'],
             'title' => ['required', 'string', 'max:255'],
             'type' => ['required', Rule::in(['video', 'article', 'live', 'file'])],
-            'video_url' => [
-                'nullable',
-                'url:https',
-                'max:500',
-                function (string $attribute, mixed $value, \Closure $fail): void {
-                    $host = parse_url($value, PHP_URL_HOST);
-                    if ($host === false || $host === null) {
-                        $fail(__('validation.url'));
-
-                        return;
-                    }
-                    $allowed = array_map('strtolower', config('video.allowed_embed_hosts', []));
-                    if (! in_array(strtolower($host), $allowed, true)) {
-                        $fail('يجب أن يكون رابط الفيديو من أحد المواقع المسموحة (مثل يوتيوب أو فيمو) وببروتوكول https.');
-                    }
-                },
-            ],
+            'video' => ['nullable', 'file', 'mimetypes:video/mp4,video/webm,video/quicktime,video/x-msvideo', 'max:512000'],
             'content' => ['nullable', 'string'],
             'duration' => ['nullable', 'integer', 'min:0'],
             'order_number' => ['nullable', 'integer', 'min:0'],

@@ -1,36 +1,25 @@
 <script setup lang="ts">
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { ArrowLeft, CreditCard } from 'lucide-vue-next';
+import { computed } from 'vue';
 import SiteHeader from '@/components/SiteHeader.vue';
-import InputError from '@/components/InputError.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
+
+const page = usePage();
+const flash = computed(() => (page.props.flash as { error?: string | null; success?: string | null }) ?? {});
 
 const props = defineProps<{
-    courses: Array<{
+    items: Array<{
+        key: string;
         id: number;
+        type: 'course' | 'book';
         title: string;
-        thumbnail: string | null;
         price: number;
     }>;
     subtotal: number;
 }>();
 
-const form = useForm({
-    card_number: '',
-    card_exp_month: '',
-    card_exp_year: '',
-    card_cvv: '',
-    card_name: '',
-});
-
 function submit() {
-    form.post('/checkout', {
-        preserveScroll: true,
-        onSuccess: () => {},
-    });
+    window.location.href = '/checkout/redirect';
 }
 
 const totalFormatted = () =>
@@ -52,119 +41,45 @@ const totalFormatted = () =>
 
             <h1 class="text-2xl font-bold text-slate-900">إتمام الدفع</h1>
             <p class="mt-1 text-slate-600">
-                أدخل بيانات البطاقة لإكمال الشراء والتسجيل في الدورات
+                سيتم تحويلك إلى صفحة Noon الآمنة لإكمال الدفع بالمبلغ الإجمالي.
             </p>
+            <div
+                v-if="flash.error"
+                class="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+            >
+                {{ flash.error }}
+            </div>
 
             <div class="mt-8 grid gap-8 lg:grid-cols-2">
-                <!-- بيانات البطاقة -->
                 <div class="rounded-2xl border border-slate-200 bg-slate-50/30 p-6">
                     <h2 class="flex items-center gap-2 text-lg font-bold text-slate-900">
                         <CreditCard class="h-5 w-5 text-violet-600" />
-                        بيانات البطاقة
+                        الدفع عبر Noon
                     </h2>
-                    <form @submit.prevent="submit" class="mt-6 space-y-4">
-                        <div>
-                            <Label for="card_name" class="text-sm font-medium text-slate-700">
-                                اسم صاحب البطاقة
-                            </Label>
-                            <Input
-                                id="card_name"
-                                v-model="form.card_name"
-                                type="text"
-                                required
-                                autocomplete="cc-name"
-                                placeholder="الاسم كما يظهر على البطاقة"
-                                class="mt-1 h-11 rounded-lg border-slate-300 bg-white px-4"
-                            />
-                            <InputError :message="form.errors.card_name" />
-                        </div>
-                        <div>
-                            <Label for="card_number" class="text-sm font-medium text-slate-700">
-                                رقم البطاقة
-                            </Label>
-                            <Input
-                                id="card_number"
-                                v-model="form.card_number"
-                                type="text"
-                                required
-                                autocomplete="cc-number"
-                                placeholder="1234 5678 9012 3456"
-                                maxlength="19"
-                                class="mt-1 h-11 rounded-lg border-slate-300 bg-white px-4 font-mono"
-                            />
-                            <InputError :message="form.errors.card_number" />
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <Label for="card_exp_month" class="text-sm font-medium text-slate-700">
-                                    شهر الانتهاء
-                                </Label>
-                                <Input
-                                    id="card_exp_month"
-                                    v-model="form.card_exp_month"
-                                    type="text"
-                                    required
-                                    placeholder="01"
-                                    maxlength="2"
-                                    class="mt-1 h-11 rounded-lg border-slate-300 bg-white px-4 font-mono"
-                                />
-                                <InputError :message="form.errors.card_exp_month" />
-                            </div>
-                            <div>
-                                <Label for="card_exp_year" class="text-sm font-medium text-slate-700">
-                                    سنة الانتهاء
-                                </Label>
-                                <Input
-                                    id="card_exp_year"
-                                    v-model="form.card_exp_year"
-                                    type="text"
-                                    required
-                                    placeholder="2028"
-                                    maxlength="4"
-                                    class="mt-1 h-11 rounded-lg border-slate-300 bg-white px-4 font-mono"
-                                />
-                                <InputError :message="form.errors.card_exp_year" />
-                            </div>
-                        </div>
-                        <div>
-                            <Label for="card_cvv" class="text-sm font-medium text-slate-700">
-                                رمز الأمان (CVV)
-                            </Label>
-                            <Input
-                                id="card_cvv"
-                                v-model="form.card_cvv"
-                                type="text"
-                                required
-                                autocomplete="cc-csc"
-                                placeholder="123"
-                                maxlength="4"
-                                class="mt-1 h-11 w-32 rounded-lg border-slate-300 bg-white px-4 font-mono"
-                            />
-                            <InputError :message="form.errors.card_cvv" />
-                        </div>
-                        <Button
-                            type="submit"
-                            class="mt-4 h-12 w-full rounded-xl bg-violet-600 text-base font-semibold text-white hover:bg-violet-700"
-                            :disabled="form.processing"
-                        >
-                            <Spinner v-if="form.processing" class="me-2 h-4 w-4" />
-                            تأكيد الدفع
-                        </Button>
-                    </form>
+                    <p class="mt-4 text-sm leading-7 text-slate-600">
+                        عند الضغط على الزر التالي سيتم إنشاء عملية الدفع بقيمة الطلب كاملة ثم تحويلك مباشرة
+                        إلى بوابة Noon لإدخال بيانات البطاقة هناك بشكل آمن.
+                    </p>
+                    <button
+                        type="button"
+                        class="mt-6 inline-flex h-12 w-full items-center justify-center rounded-xl bg-violet-600 px-6 text-base font-semibold text-white shadow-lg transition hover:bg-violet-700"
+                        @click="submit"
+                    >
+                        الذهاب إلى نون للدفع
+                    </button>
                 </div>
 
-                <!-- ملخص الطلب -->
                 <div class="rounded-2xl border border-slate-200 bg-slate-50/30 p-6">
                     <h2 class="text-lg font-bold text-slate-900">ملخص الطلب</h2>
                     <ul class="mt-4 space-y-3">
                         <li
-                            v-for="course in courses"
-                            :key="course.id"
+                            v-for="item in items"
+                            :key="item.key"
                             class="flex justify-between text-sm"
                         >
-                            <span class="text-slate-700 line-clamp-1">{{ course.title }}</span>
+                            <span class="text-slate-700 line-clamp-1">{{ item.title }}</span>
                             <span class="shrink-0 font-semibold text-slate-900">
-                                {{ course.price > 0 ? `$${course.price.toFixed(2)}` : 'مجاني' }}
+                                {{ item.price > 0 ? `$${item.price.toFixed(2)}` : 'مجاني' }}
                             </span>
                         </li>
                     </ul>

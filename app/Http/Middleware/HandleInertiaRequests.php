@@ -28,7 +28,7 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
             ],
             'cartCount' => $request->user()
-                ? count((array) $request->session()->get('cart', []))
+                ? count((array) $request->session()->get('cart', [])) + count((array) $request->session()->get('book_cart', []))
                 : 0,
         ];
     }

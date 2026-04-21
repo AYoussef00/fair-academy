@@ -8,7 +8,7 @@
     <p class="text-gray-600 mt-1">{{ $course->title }} · {{ $lesson->module->title }}</p>
 </div>
 
-<form action="{{ route('instructor.lessons.update', [$course, $lesson]) }}" method="POST" class="bg-white rounded-xl shadow border border-gray-100 p-6 max-w-2xl">
+<form action="{{ route('instructor.lessons.update', [$course, $lesson]) }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-xl shadow border border-gray-100 p-6 max-w-2xl">
     @csrf
     @method('PUT')
 
@@ -38,8 +38,13 @@
     </div>
 
     <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">رابط الفيديو</label>
-        <input type="text" name="video_url" value="{{ old('video_url', $lesson->video_url) }}" class="w-full rounded-lg border border-gray-300 px-3 py-2">
+        <label class="block text-sm font-medium text-gray-700 mb-1">رفع الفيديو</label>
+        @if($lesson->video_url)
+            @php $videoSrc = str_starts_with($lesson->video_url, 'http') ? $lesson->video_url : asset('storage/'.$lesson->video_url); @endphp
+            <p class="mb-2 text-sm text-slate-500">يوجد فيديو مرفوع حاليًا. <a href="{{ $videoSrc }}" target="_blank" rel="noopener" class="text-violet-600 hover:underline">عرض الفيديو</a></p>
+        @endif
+        <input type="file" name="video" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-slate-600 file:me-3 file:rounded-lg file:border-0 file:bg-violet-50 file:px-4 file:py-2 file:font-medium file:text-violet-700 hover:file:bg-violet-100">
+        @error('video')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
     </div>
 
     <div class="mb-4">

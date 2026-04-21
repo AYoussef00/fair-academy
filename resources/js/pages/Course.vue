@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import {
     ArrowRight,
     BookOpen,
@@ -58,9 +58,15 @@ const props = withDefaults(
 
 const page = usePage();
 const flashSuccess = computed(() => (page.props.flash as { success?: string })?.success);
+const flashError = computed(() => (page.props.flash as { error?: string })?.error);
+const showSuccessPopup = ref(Boolean(flashSuccess.value));
 
 function addToCart() {
     router.post(`/cart/add/${props.course.id}`);
+}
+
+function buyNow() {
+    window.location.href = `/checkout/course/${props.course.id}/redirect`;
 }
 
 const totalLessons = computed(() =>
@@ -163,6 +169,28 @@ function lessonIcon(type: string) {
     <Head :title="`${course.title} – أكاديمية فايرير للتدريب والتعليم`" />
     <div class="min-h-screen bg-[#fafafa]">
         <SiteHeader />
+
+        <div
+            v-if="showSuccessPopup && flashSuccess"
+            class="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm"
+        >
+            <div class="w-full max-w-md rounded-[2rem] bg-white p-7 text-center shadow-2xl">
+                <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                    <CheckCircle2 class="h-9 w-9" />
+                </div>
+                <h2 class="mt-5 text-2xl font-bold text-slate-950">تم الدفع بنجاح</h2>
+                <p class="mt-3 text-sm leading-7 text-slate-600">
+                    {{ flashSuccess }}
+                </p>
+                <button
+                    type="button"
+                    class="mt-6 inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                    @click="showSuccessPopup = false"
+                >
+                    إغلاق
+                </button>
+            </div>
+        </div>
 
         <!-- Dark header: breadcrumbs, title, tagline, meta -->
         <header class="border-b border-slate-200 bg-slate-900 px-4 py-8 text-white md:px-6">
@@ -315,14 +343,14 @@ function lessonIcon(type: string) {
                             </div>
                         </div>
                         <div
-                            v-if="flashSuccess"
-                            class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800"
+                            v-if="flashError"
+                            class="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800"
                         >
-                            {{ flashSuccess }}
+                            {{ flashError }}
                         </div>
                         <p class="mt-4 text-sm text-slate-500">اشترِ دورات فردية</p>
                         <p class="mt-1 text-2xl font-bold text-slate-900">
-                            {{ course.price != null && course.price > 0 ? `$${Number(course.price).toFixed(2)}` : 'مجاني' }}
+                            {{ course.price != null && course.price > 0 ? `${Number(course.price).toFixed(2)} ر.س` : 'مجاني' }}
                         </p>
                         <ul class="mt-4 space-y-2 text-sm text-slate-600">
                             <li class="flex items-center gap-2">
@@ -358,14 +386,15 @@ function lessonIcon(type: string) {
                                         class="flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 py-3.5 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700"
                                         @click="addToCart"
                                     >
-                                        إضافة إلى العربة
+                                        أضف إلى السلة
                                     </button>
-                                    <Link
-                                        :href="`/course/${course.id}`"
+                                    <button
+                                        type="button"
                                         class="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-slate-300 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                                        @click="buyNow"
                                     >
                                         شراء الآن
-                                    </Link>
+                                    </button>
                                 </template>
                             </template>
                             <template v-else>
@@ -373,7 +402,7 @@ function lessonIcon(type: string) {
                                     :href="login()"
                                     class="flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 py-3.5 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700"
                                 >
-                                    إضافة إلى العربة
+                                    أضف إلى السلة
                                 </Link>
                                 <Link
                                     :href="login()"

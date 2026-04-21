@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminCoursesController;
 use App\Http\Controllers\Admin\AdminDigitalBooksController;
 use App\Http\Controllers\Admin\AdminMediaJournalController;
+use App\Http\Controllers\Admin\AdminPaymentsController;
 use App\Http\Controllers\Admin\AdminProgramsController;
 use App\Http\Controllers\Admin\AdminStudentsController;
 use App\Http\Controllers\Admin\AdminUsersController;
@@ -14,6 +15,8 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardDispatcherController;
 use App\Http\Controllers\DigitalLibraryController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\MyBooksController;
+use App\Http\Controllers\MyInvoicesController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\ScientificJournalController;
 use App\Http\Controllers\Student\StudentAssignmentsController;
@@ -33,6 +36,7 @@ Route::get('/courses', [CourseController::class, 'index'])->name('courses');
 Route::get('/programs', [ProgramController::class, 'index'])->name('programs');
 Route::get('/scientific-journal', [ScientificJournalController::class, 'index'])->name('scientific-journal');
 Route::get('/digital-library', [DigitalLibraryController::class, 'index'])->name('digital-library');
+Route::get('/digital-library/books/{digitalBook}', [DigitalLibraryController::class, 'show'])->name('digital-library.books.show');
 
 Route::inertia('/welcome', 'Welcome', [
     'canRegister' => Features::enabled(Features::registration()),
@@ -88,6 +92,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/users', [AdminUsersController::class, 'store'])->name('users.store');
         Route::get('/students', [AdminStudentsController::class, 'index'])->name('students.index');
         Route::get('/courses', [AdminCoursesController::class, 'index'])->name('courses.index');
+        Route::get('/courses/create', [AdminCoursesController::class, 'create'])->name('courses.create');
+        Route::post('/courses', [AdminCoursesController::class, 'store'])->name('courses.store');
+        Route::patch('/courses/{course}/toggle-status', [AdminCoursesController::class, 'toggleStatus'])->name('courses.toggle-status');
         Route::get('/programs', [AdminProgramsController::class, 'index'])->name('programs.index');
         Route::get('/digital-books', [AdminDigitalBooksController::class, 'index'])->name('digital-books.index');
         Route::patch('/digital-books/{digitalBook}/approve', [AdminDigitalBooksController::class, 'approve'])->name('digital-books.approve');
@@ -95,6 +102,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/media-journal', [AdminMediaJournalController::class, 'index'])->name('media-journal.index');
         Route::patch('/media-journal/{article}/approve', [AdminMediaJournalController::class, 'approve'])->name('media-journal.approve');
         Route::patch('/media-journal/{article}/reject', [AdminMediaJournalController::class, 'reject'])->name('media-journal.reject');
+        Route::get('/payments', [AdminPaymentsController::class, 'index'])->name('payments.index');
         Route::get('/categories', [\App\Http\Controllers\Admin\AdminCategoryController::class, 'index'])->name('categories.index');
         Route::get('/categories/create', [\App\Http\Controllers\Admin\AdminCategoryController::class, 'create'])->name('categories.create');
         Route::post('/categories', [\App\Http\Controllers\Admin\AdminCategoryController::class, 'store'])->name('categories.store');
@@ -115,14 +123,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
      */
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add/{course}', [CartController::class, 'add'])->name('cart.add')->middleware('throttle:checkout');
+    Route::post('/cart/add-book/{digitalBook}', [CartController::class, 'addBook'])->name('cart.books.add')->middleware('throttle:checkout');
     Route::delete('/cart/remove/{course}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::delete('/cart/remove-book/{digitalBook}', [CartController::class, 'removeBook'])->name('cart.books.remove');
+    Route::get('/my-books', [MyBooksController::class, 'index'])->name('my-books');
+    Route::get('/my-invoices', [MyInvoicesController::class, 'index'])->name('my-invoices');
+    Route::get('/my-invoices/{order}', [MyInvoicesController::class, 'show'])->name('my-invoices.show');
 
     /*
      * Checkout & payment success
      */
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::get('/checkout/redirect', [CheckoutController::class, 'redirectToNoon'])->name('checkout.redirect');
+    Route::get('/checkout/course/{course}/redirect', [CheckoutController::class, 'redirectCourseToNoon'])->name('checkout.course.redirect');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store')->middleware('throttle:checkout');
     Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
+    Route::get('/payment-success', [CheckoutController::class, 'success'])->name('payment.success');
+    Route::get('/payment-failed', [CheckoutController::class, 'failed'])->name('payment.failed');
 
     /*
      * Lessons & modules: require auth (enrolled users watch content)

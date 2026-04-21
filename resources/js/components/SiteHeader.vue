@@ -37,9 +37,9 @@ const logoHref = computed(() => home());
 
 <template>
     <header
-        class="sticky top-0 z-50 border-b border-slate-200/90 bg-white/95 backdrop-blur"
+        class="sticky top-0 z-50 border-b border-white/70 bg-white/80 backdrop-blur-xl"
     >
-        <div class="mx-auto flex h-14 max-w-7xl items-center gap-2 px-3 sm:h-16 sm:gap-4 sm:px-6">
+        <div class="mx-auto flex h-16 max-w-7xl items-center gap-2 px-3 sm:h-[4.5rem] sm:gap-4 sm:px-6">
             <!-- Logo -->
             <Link
                 :href="logoHref"
@@ -56,25 +56,25 @@ const logoHref = computed(() => home());
             <nav class="hidden shrink-0 items-center gap-1 lg:flex">
                 <Link
                     href="/programs"
-                    class="rounded px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+                    class="rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
                 >
                     البرامج
                 </Link>
                 <Link
                     :href="courses()"
-                    class="rounded px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+                    class="rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
                 >
                     الدورات
                 </Link>
                 <Link
                     href="/scientific-journal"
-                    class="rounded px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+                    class="rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
                 >
                     المجلة العلمية
                 </Link>
                 <Link
                     href="/digital-library"
-                    class="rounded px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+                    class="rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
                 >
                     المكتبة الرقمية
                 </Link>
@@ -88,7 +88,7 @@ const logoHref = computed(() => home());
                 <input
                     type="search"
                     placeholder="ابحث عن أي شيء"
-                    class="h-10 w-full rounded-full border border-slate-200 bg-slate-50 ps-11 pe-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-violet-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-violet-500"
+                    class="h-11 w-full rounded-full border border-white/80 bg-slate-100/80 ps-11 pe-4 text-sm text-slate-900 placeholder:text-slate-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] focus:border-[#ed9134]/40 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#ed9134]/15"
                 />
             </div>
 
@@ -97,12 +97,12 @@ const logoHref = computed(() => home());
                 <Link
                     v-if="authUser"
                     href="/cart"
-                    class="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50"
+                    class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/80 bg-white text-slate-600 shadow-sm transition hover:bg-slate-50"
                 >
                     <ShoppingCart class="h-5 w-5" />
                     <span
                         v-if="cartCount > 0"
-                        class="absolute -top-0.5 -end-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-violet-600 px-1 text-[10px] font-bold text-white"
+                        class="absolute -top-0.5 -end-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#ed9134] px-1 text-[10px] font-bold text-white"
                     >
                         {{ cartCount > 99 ? '99+' : cartCount }}
                     </span>
@@ -115,7 +115,7 @@ const logoHref = computed(() => home());
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                class="relative h-10 w-10 rounded-full p-0"
+                            class="relative h-10 w-10 rounded-full border border-white/80 bg-white p-0 shadow-sm"
                             >
                                 <Avatar class="h-8 w-8">
                                     <AvatarImage
@@ -140,14 +140,14 @@ const logoHref = computed(() => home());
                     <Link :href="login()" class="hidden md:block">
                         <Button
                             variant="outline"
-                            class="h-9 rounded-full border-[#ed9134] bg-transparent px-4 text-sm font-medium text-[#ed9134] hover:bg-[#fff4e8]"
+                            class="h-10 rounded-full border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
                         >
                             تسجيل دخول
                         </Button>
                     </Link>
                     <Link :href="register()" class="hidden md:block">
                         <Button
-                            class="h-9 rounded-full bg-[#ed9134] px-4 text-sm font-semibold text-white hover:bg-[#d67d2a]"
+                            class="h-10 rounded-full bg-slate-950 px-5 text-sm font-semibold text-white shadow-lg shadow-slate-950/10 hover:bg-slate-800"
                         >
                             اشترك الآن
                         </Button>
@@ -157,7 +157,7 @@ const logoHref = computed(() => home());
                 <Button
                     variant="outline"
                     size="icon"
-                    class="hidden h-9 w-9 shrink-0 rounded-full border-slate-200 bg-white lg:inline-flex"
+                    class="hidden h-10 w-10 shrink-0 rounded-full border-white/80 bg-white shadow-sm lg:inline-flex"
                 >
                     <Globe class="h-5 w-5 text-slate-600" />
                     <span class="sr-only">اللغة</span>
@@ -169,7 +169,7 @@ const logoHref = computed(() => home());
                         <Button
                             variant="ghost"
                             size="icon"
-                            class="h-9 w-9 lg:hidden"
+                        class="h-10 w-10 rounded-full border border-white/70 bg-white shadow-sm lg:hidden"
                         >
                             <Menu class="h-5 w-5" />
                         </Button>

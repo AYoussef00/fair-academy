@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\DigitalBook;
+use App\Models\OrderItem;
+use App\Services\BackfillLegacyOrderItems;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -11,25 +13,58 @@ use Inertia\Response;
 
 class DigitalLibraryController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, BackfillLegacyOrderItems $backfillLegacyOrderItems): Response
     {
+        $purchasedBookIds = [];
+
+        if ($request->user() !== null) {
+            $backfillLegacyOrderItems->forUser($request->user());
+
+            $purchasedBookIds = OrderItem::query()
+                ->where('item_type', 'book')
+                ->whereHas('order', fn ($query) => $query
+                    ->where('user_id', $request->user()->id)
+                    ->where('status', 'paid'))
+                ->pluck('item_id')
+                ->filter()
+                ->map(fn ($id) => (int) $id)
+                ->all();
+        }
+
         $approvedBooks = DigitalBook::query()
             ->where('status', 'approved')
             ->latest()
             ->get()
-            ->map(fn (DigitalBook $book) => [
-                'id' => $book->id,
-                'title' => $book->title,
-                'cover' => $book->cover_path ? Storage::url($book->cover_path) : null,
-                'price' => (float) $book->price,
-                'purchase_count' => (int) $book->purchase_count,
-                'status' => $book->status,
-            ])
+            ->map(fn (DigitalBook $book) => $this->transformBook($book, in_array($book->id, $purchasedBookIds, true)))
             ->values();
 
         return Inertia::render('DigitalLibrary', [
             'approvedBooks' => $approvedBooks,
             'isAuthenticated' => $request->user() !== null,
+        ]);
+    }
+
+    public function show(Request $request, DigitalBook $digitalBook, BackfillLegacyOrderItems $backfillLegacyOrderItems): Response
+    {
+        abort_if($digitalBook->status !== 'approved', 404);
+
+        if ($request->user() !== null) {
+            $backfillLegacyOrderItems->forUser($request->user());
+        }
+
+        $isPurchased = $request->user() !== null
+            && OrderItem::query()
+                ->where('item_type', 'book')
+                ->where('item_id', $digitalBook->id)
+                ->whereHas('order', fn ($query) => $query
+                    ->where('user_id', $request->user()->id)
+                    ->where('status', 'paid'))
+                ->exists();
+
+        return Inertia::render('DigitalBookDetails', [
+            'book' => $this->transformBook($digitalBook),
+            'isAuthenticated' => $request->user() !== null,
+            'isPurchased' => $isPurchased,
         ]);
     }
 
@@ -62,5 +97,18 @@ class DigitalLibraryController extends Controller
         ]);
 
         return back()->with('success', 'تم إرسال الكتاب للمراجعة بنجاح.');
+    }
+
+    private function transformBook(DigitalBook $book, bool $isPurchased = false): array
+    {
+        return [
+            'id' => $book->id,
+            'title' => $book->title,
+            'cover' => $book->cover_path ? Storage::url($book->cover_path) : null,
+            'price' => (float) $book->price,
+            'purchase_count' => (int) $book->purchase_count,
+            'status' => $book->status,
+            'is_purchased' => $isPurchased,
+        ];
     }
 }

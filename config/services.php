@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    'noon' => [
+        'api_key' => env('NOON_API_KEY'),
+        'api_url' => env('NOON_API_URL', 'https://api-test.noonpayments.com'),
+        'success_url' => env('NOON_SUCCESS_URL'),
+        'failure_url' => env('NOON_FAILURE_URL'),
+        'application_id' => env('NOON_APPLICATION_ID'),
+        'business_id' => env('NOON_BUSINESS_ID'),
+    ],
+
 ];
