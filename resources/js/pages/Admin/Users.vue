@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import {
     BarChart3,
     BookOpen,
@@ -9,8 +9,10 @@ import {
     GraduationCap,
     LayoutDashboard,
     Newspaper,
+    Trash2,
     UserRound,
 } from 'lucide-vue-next';
+import { computed } from 'vue';
 import { Card } from '@/components/ui/card';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
@@ -43,7 +45,13 @@ const props = withDefaults(
 );
 
 const page = usePage();
-const flash = page.props.flash as { success?: string };
+const flash = computed(() => (page.props.flash as { success?: string | null; error?: string | null }) ?? {});
+
+const authUserId = computed(() => {
+    const auth = page.props.auth as { user?: { id: number } } | undefined;
+
+    return auth?.user?.id ?? null;
+});
 
 const userForm = useForm({
     name: '',
@@ -69,7 +77,7 @@ const sidebarItems = [
     { title: 'البرامج', href: '/admin/programs', icon: FolderOpen, active: false },
     { title: 'الكتب الرقمية', href: '/admin/digital-books', icon: BookText, active: false },
     { title: 'المجلة الاعلامية', href: '/admin/media-journal', icon: Newspaper, active: false },
-    { title: 'المدفوعات', href: null, icon: CreditCard, active: false },
+    { title: 'المدفوعات', href: '/admin/payments', icon: CreditCard, active: false },
     { title: 'التقارير', href: null, icon: BarChart3, active: false },
 ];
 
@@ -78,6 +86,13 @@ function submitUser() {
         preserveScroll: true,
         onSuccess: () => userForm.reset('name', 'email', 'password'),
     });
+}
+
+function deleteUser(id: number, name: string) {
+    if (! confirm(`حذف المستخدم «${name}» نهائيًا؟ لا يمكن التراجع عن ذلك.`)) {
+        return;
+    }
+    router.delete(`/admin/users/${id}`, { preserveScroll: true });
 }
 </script>
 
@@ -135,6 +150,19 @@ function submitUser() {
 
                 <main class="min-w-0 flex-1">
                     <div class="w-full space-y-6 px-6 py-6">
+                        <div
+                            v-if="flash.success"
+                            class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200"
+                        >
+                            {{ flash.success }}
+                        </div>
+                        <div
+                            v-if="flash.error"
+                            class="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-200"
+                        >
+                            {{ flash.error }}
+                        </div>
+
                         <div class="rounded-lg border border-slate-200 bg-white px-6 py-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                             <h1 class="text-2xl font-semibold text-slate-900 dark:text-slate-100">المستخدمين</h1>
                             <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
@@ -144,13 +172,6 @@ function submitUser() {
 
                         <Card class="border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                             <h2 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">إضافة مستخدم جديد</h2>
-
-                            <p
-                                v-if="flash?.success"
-                                class="mb-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700"
-                            >
-                                {{ flash.success }}
-                            </p>
 
                             <form class="grid gap-4 md:grid-cols-2" @submit.prevent="submitUser">
                                 <div>
@@ -205,6 +226,7 @@ function submitUser() {
                                             <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">البريد الإلكتروني</th>
                                             <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">الدور</th>
                                             <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">تاريخ الإضافة</th>
+                                            <th class="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">إجراءات</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -213,6 +235,18 @@ function submitUser() {
                                             <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ user.email }}</td>
                                             <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ roleLabels[user.role] || user.role }}</td>
                                             <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ user.created_at || '—' }}</td>
+                                            <td class="px-4 py-3">
+                                                <button
+                                                    v-if="authUserId !== user.id"
+                                                    type="button"
+                                                    class="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-300 dark:hover:bg-rose-950"
+                                                    @click="deleteUser(user.id, user.name)"
+                                                >
+                                                    <Trash2 class="h-3.5 w-3.5" />
+                                                    حذف
+                                                </button>
+                                                <span v-else class="text-xs text-slate-400">—</span>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>

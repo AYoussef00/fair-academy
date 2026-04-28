@@ -90,6 +90,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
         Route::get('/users', [AdminUsersController::class, 'index'])->name('users.index');
         Route::post('/users', [AdminUsersController::class, 'store'])->name('users.store');
+        Route::delete('/users/{user}', [AdminUsersController::class, 'destroy'])->name('users.destroy');
         Route::get('/students', [AdminStudentsController::class, 'index'])->name('students.index');
         Route::get('/courses', [AdminCoursesController::class, 'index'])->name('courses.index');
         Route::get('/courses/create', [AdminCoursesController::class, 'create'])->name('courses.create');

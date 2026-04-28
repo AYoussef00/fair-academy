@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Course;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -59,5 +61,29 @@ class AdminUsersController extends Controller
         $user->syncRoles([$validated['role']]);
 
         return back()->with('success', 'تم إضافة المستخدم بنجاح.');
+    }
+
+    public function destroy(Request $request, User $user): RedirectResponse
+    {
+        if ($request->user()->id === $user->id) {
+            return back()->with('error', 'لا يمكنك حذف حسابك الحالي.');
+        }
+
+        if ($user->role === 'admin' && User::query()->where('role', 'admin')->count() <= 1) {
+            return back()->with('error', 'لا يمكن حذف آخر مدير في النظام.');
+        }
+
+        if (Course::query()->where('instructor_id', $user->id)->exists()) {
+            return back()->with('error', 'لا يمكن حذف مستخدم مسجّل كمدرّس لدورات. غيّر مدرّس الدورات أو احذفها أولًا.');
+        }
+
+        if (Order::query()->where('user_id', $user->id)->exists()) {
+            return back()->with('error', 'لا يمكن حذف مستخدم لديه طلبات شراء في النظام.');
+        }
+
+        $user->roles()->detach();
+        $user->delete();
+
+        return back()->with('success', 'تم حذف المستخدم.');
     }
 }
