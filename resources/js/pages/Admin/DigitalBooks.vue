@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import {
     BarChart3,
     BookOpen,
@@ -10,9 +10,11 @@ import {
     GraduationCap,
     LayoutDashboard,
     Newspaper,
+    Trash2,
     UserRound,
     XCircle,
 } from 'lucide-vue-next';
+import { computed } from 'vue';
 import { Card } from '@/components/ui/card';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
@@ -71,6 +73,16 @@ function approveBook(id: number) {
 function rejectBook(id: number) {
     router.patch(`/admin/digital-books/${id}/reject`);
 }
+
+function deleteApprovedBook(id: number) {
+    if (! confirm('حذف هذا الكتاب نهائيًا من المكتبة؟ لا يمكن التراجع عن ذلك.')) {
+        return;
+    }
+    router.delete(`/admin/digital-books/${id}`);
+}
+
+const page = usePage();
+const flash = computed(() => (page.props.flash as { success?: string | null }) ?? {});
 </script>
 
 <template>
@@ -127,6 +139,13 @@ function rejectBook(id: number) {
 
                 <main class="min-w-0 flex-1">
                     <div class="w-full space-y-6 px-6 py-6">
+                        <div
+                            v-if="flash.success"
+                            class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200"
+                        >
+                            {{ flash.success }}
+                        </div>
+
                         <div class="rounded-lg border border-slate-200 bg-white px-6 py-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
@@ -199,15 +218,25 @@ function rejectBook(id: number) {
                                 <div
                                     v-for="book in props.approvedBooks"
                                     :key="book.id"
-                                    class="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-slate-700"
+                                    class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-slate-700"
                                 >
-                                    <div>
+                                    <div class="min-w-0 flex-1">
                                         <p class="font-medium text-slate-900 dark:text-slate-100">{{ book.title }}</p>
                                         <p class="text-xs text-slate-500 dark:text-slate-400">
                                             {{ book.price.toFixed(2) }} ر.س - {{ book.owner_name }}
                                         </p>
                                     </div>
-                                    <p class="text-xs text-slate-500 dark:text-slate-400">المبيعات: {{ book.purchase_count }}</p>
+                                    <div class="flex flex-wrap items-center gap-3">
+                                        <p class="text-xs text-slate-500 dark:text-slate-400">المبيعات: {{ book.purchase_count }}</p>
+                                        <button
+                                            type="button"
+                                            class="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-300 dark:hover:bg-rose-950"
+                                            @click="deleteApprovedBook(book.id)"
+                                        >
+                                            <Trash2 class="h-3.5 w-3.5" />
+                                            حذف
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </Card>

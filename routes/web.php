@@ -101,6 +101,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/digital-books', [AdminDigitalBooksController::class, 'store'])->name('digital-books.store')->middleware('throttle:uploads');
         Route::patch('/digital-books/{digitalBook}/approve', [AdminDigitalBooksController::class, 'approve'])->name('digital-books.approve');
         Route::patch('/digital-books/{digitalBook}/reject', [AdminDigitalBooksController::class, 'reject'])->name('digital-books.reject');
+        Route::delete('/digital-books/{digitalBook}', [AdminDigitalBooksController::class, 'destroy'])->name('digital-books.destroy');
         Route::get('/media-journal', [AdminMediaJournalController::class, 'index'])->name('media-journal.index');
         Route::get('/media-journal/create', [AdminMediaJournalController::class, 'create'])->name('media-journal.create');
         Route::post('/media-journal', [AdminMediaJournalController::class, 'store'])->name('media-journal.store')->middleware('throttle:uploads');

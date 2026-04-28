@@ -107,4 +107,17 @@ class AdminDigitalBooksController extends Controller
 
         return back()->with('success', 'تم رفض الكتاب.');
     }
+
+    public function destroy(DigitalBook $digitalBook): RedirectResponse
+    {
+        abort_unless($digitalBook->status === 'approved', 403);
+
+        if ($digitalBook->cover_path) {
+            Storage::disk('public')->delete($digitalBook->cover_path);
+        }
+
+        $digitalBook->delete();
+
+        return back()->with('success', 'تم حذف الكتاب من المكتبة.');
+    }
 }
