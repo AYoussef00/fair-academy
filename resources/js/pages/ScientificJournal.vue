@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
-import { ArrowRight, BookText, FileCheck2, Microscope } from 'lucide-vue-next';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { ArrowRight, BookText, FileCheck2, Microscope, Send } from 'lucide-vue-next';
+import { computed } from 'vue';
 import SiteHeader from '@/components/SiteHeader.vue';
 
 const props = withDefaults(
@@ -17,11 +18,35 @@ const props = withDefaults(
             author?: string | null;
             published_at?: string | null;
         }>;
+        canSubmit?: boolean;
     }>(),
     {
         articles: () => [],
+        canSubmit: false,
     }
 );
+
+const page = usePage();
+const flash = computed(() => (page.props.flash as { success?: string | null; error?: string | null }) ?? {});
+
+const form = useForm({
+    title: '',
+    researcher_name: '',
+    excerpt: '',
+    keywords: '',
+    pdf: null as File | null,
+});
+
+function submitArticle() {
+    form.post('/scientific-journal/submissions', {
+        forceFormData: true,
+        preserveScroll: true,
+        onSuccess: () => {
+            form.reset();
+            form.clearErrors();
+        },
+    });
+}
 </script>
 
 <template>
@@ -47,6 +72,119 @@ const props = withDefaults(
                 <p class="mt-4 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
                     مساحة متخصصة لعرض المحتوى العلمي الاحترافي، مصممة لنشر الأبحاث والأوراق المعتمدة بجودة أكاديمية عالية.
                 </p>
+            </div>
+        </section>
+
+        <section class="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
+            <div
+                v-if="flash.success"
+                class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800"
+            >
+                {{ flash.success }}
+            </div>
+            <div
+                v-if="flash.error"
+                class="mb-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800"
+            >
+                {{ flash.error }}
+            </div>
+
+            <div
+                v-if="props.canSubmit"
+                class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
+            >
+                <h2 class="text-xl font-bold text-slate-900 sm:text-2xl">
+                    إضافة مقال للمجلة (إرسال للمراجعة)
+                </h2>
+                <p class="mt-2 text-sm text-slate-600">
+                    املأ البيانات وارفع ملف PDF. يظهر المقال في الموقع بعد موافقة الإدارة.
+                </p>
+
+                <form class="mt-6 space-y-5" @submit.prevent="submitArticle">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700">عنوان المقال *</label>
+                        <input
+                            v-model="form.title"
+                            type="text"
+                            required
+                            class="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2.5 text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20"
+                        >
+                        <p v-if="form.errors.title" class="mt-1 text-sm text-rose-600">{{ form.errors.title }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700">اسم الباحث / الكاتب *</label>
+                        <input
+                            v-model="form.researcher_name"
+                            type="text"
+                            required
+                            class="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2.5 text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20"
+                        >
+                        <p v-if="form.errors.researcher_name" class="mt-1 text-sm text-rose-600">{{ form.errors.researcher_name }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700">ملخص المقال *</label>
+                        <textarea
+                            v-model="form.excerpt"
+                            required
+                            rows="4"
+                            maxlength="600"
+                            class="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2.5 text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20"
+                        />
+                        <p v-if="form.errors.excerpt" class="mt-1 text-sm text-rose-600">{{ form.errors.excerpt }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700">الكلمات المفتاحية *</label>
+                        <input
+                            v-model="form.keywords"
+                            type="text"
+                            required
+                            class="mt-2 block w-full rounded-xl border border-slate-300 px-4 py-2.5 text-slate-900 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20"
+                        >
+                        <p v-if="form.errors.keywords" class="mt-1 text-sm text-rose-600">{{ form.errors.keywords }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700">ملف PDF *</label>
+                        <input
+                            type="file"
+                            accept="application/pdf"
+                            required
+                            class="mt-2 block w-full text-sm text-slate-600 file:me-3 file:rounded-lg file:border-0 file:bg-violet-50 file:px-4 file:py-2 file:font-medium file:text-violet-700 hover:file:bg-violet-100"
+                            @change="form.pdf = ($event.target as HTMLInputElement).files?.[0] ?? null"
+                        >
+                        <p v-if="form.errors.pdf" class="mt-1 text-sm text-rose-600">{{ form.errors.pdf }}</p>
+                    </div>
+                    <button
+                        type="submit"
+                        :disabled="form.processing"
+                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-violet-700 disabled:opacity-60"
+                    >
+                        <Send class="h-4 w-4" />
+                        إرسال للمراجعة
+                    </button>
+                </form>
+            </div>
+
+            <div
+                v-else
+                class="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center shadow-sm sm:p-8"
+            >
+                <p class="text-sm text-slate-600">
+                    سجّل الدخول لإرسال مقال أو بحث للمراجعة ونشره في المجلة بعد الاعتماد.
+                </p>
+                <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
+                    <Link
+                        href="/login"
+                        class="inline-flex rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-700"
+                    >
+                        تسجيل الدخول
+                    </Link>
+                    <Link
+                        href="/register"
+                        class="inline-flex rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                    >
+                        إنشاء حساب
+                    </Link>
+                </div>
             </div>
         </section>
 

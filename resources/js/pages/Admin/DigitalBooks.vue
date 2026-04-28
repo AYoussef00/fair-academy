@@ -60,7 +60,7 @@ const sidebarItems = [
     { title: 'البرامج', href: '/admin/programs', icon: FolderOpen, active: false },
     { title: 'الكتب الرقمية', href: '/admin/digital-books', icon: BookText, active: true },
     { title: 'المجلة الاعلامية', href: '/admin/media-journal', icon: Newspaper, active: false },
-    { title: 'المدفوعات', href: null, icon: CreditCard, active: false },
+    { title: 'المدفوعات', href: '/admin/payments', icon: CreditCard, active: false },
     { title: 'التقارير', href: null, icon: BarChart3, active: false },
 ];
 
@@ -128,10 +128,20 @@ function rejectBook(id: number) {
                 <main class="min-w-0 flex-1">
                     <div class="w-full space-y-6 px-6 py-6">
                         <div class="rounded-lg border border-slate-200 bg-white px-6 py-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                            <h1 class="text-2xl font-semibold text-slate-900 dark:text-slate-100">مراجعة الكتب الرقمية</h1>
-                            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                وافق أو ارفض الكتب التي رفعها المستخدمون قبل نشرها في المكتبة.
-                            </p>
+                            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <h1 class="text-2xl font-semibold text-slate-900 dark:text-slate-100">مراجعة الكتب الرقمية</h1>
+                                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                        وافق أو ارفض الكتب التي رفعها المستخدمون قبل نشرها في المكتبة، أو أضف كتابًا جديدًا من لوحة المدير.
+                                    </p>
+                                </div>
+                                <Link
+                                    href="/admin/digital-books/create"
+                                    class="inline-flex items-center justify-center rounded-xl bg-[#ed9134] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#d67d2a]"
+                                >
+                                    إضافة كتاب
+                                </Link>
+                            </div>
                         </div>
 
                         <Card class="border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">

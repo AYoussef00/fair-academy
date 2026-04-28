@@ -12,6 +12,38 @@ use Inertia\Response;
 
 class AdminDigitalBooksController extends Controller
 {
+    public function create(): Response
+    {
+        return Inertia::render('Admin/DigitalBooksCreate');
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'price' => ['required', 'numeric', 'min:0', 'max:999999.99'],
+            'cover' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+        ], [
+            'cover.uploaded' => 'تعذر رفع صورة الغلاف من السيرفر. جرّب صورة أصغر ثم أعد المحاولة.',
+        ]);
+
+        $coverPath = $request->file('cover')->store('digital-books/covers', 'public');
+
+        DigitalBook::create([
+            'user_id' => $request->user()->id,
+            'title' => $validated['title'],
+            'cover_path' => $coverPath,
+            'price' => (float) $validated['price'],
+            'purchase_count' => 0,
+            'status' => 'approved',
+            'reviewed_by' => $request->user()->id,
+            'reviewed_at' => now(),
+        ]);
+
+        return redirect()->route('admin.digital-books.index')
+            ->with('success', 'تم إضافة الكتاب ونشره في المكتبة.');
+    }
+
     public function index(): Response
     {
         $pendingBooks = DigitalBook::query()
